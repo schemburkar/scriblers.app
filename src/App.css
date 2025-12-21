@@ -129,10 +129,10 @@
 }
 
 body {
-    @apply h-lvh flex m-0 flex-col bg-background/95
+    @apply h-lvh flex m-0 flex-col bg-background/35
     /*backdrop-filter: var(--background);*/;
 }
 
-*[data-slot="sidebar-inner"] {
+/**[data-slot="sidebar-inner"] {
     @apply h-[calc(100%-2.5rem)];
-}
+}*/
