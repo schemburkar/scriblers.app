@@ -1,10 +1,7 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { Tabs } from "./components/tabs";
 import { Textarea } from "./components/ui/textarea";
 import { TabProvider, useTabs } from "./components/tab-provider";
-import { Button } from "./components/ui/button";
 
 function App() {
   return (
@@ -28,7 +25,7 @@ const Text = () => {
   if (!currentId) return null;
   const activeTab = tabs.get(currentId);
   if (!activeTab) return null;
-  const { id, name, path, content, state } = activeTab;
+  const { name, path, state } = activeTab;
   return (
     <>
       <Textarea

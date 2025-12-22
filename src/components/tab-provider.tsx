@@ -69,7 +69,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   const { keys, set, remove, get } = OpenFileStore();
   const { get: getSettings, set: setSettings } = SettingsStore();
   const [tabs, setTabs] = useState<Map<string, Tab>>(new Map<string, Tab>());
-  const [current, setCurrent] = useState<string>();
+  const [currenId, setCurrentId] = useState<string>();
   const [theme, setTheme] = useState<string>();
 
   const newTab = useCallback(() => {
@@ -86,7 +86,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     });
 
     setTabs((prev) => {
-      setCurrent(tab.id);
+      setCurrentId(tab.id);
       return prev;
     });
 
@@ -109,7 +109,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       });
 
       setTabs((prev) => {
-        setCurrent(prev.size - 1);
+        setCurrentId(tab.id);
         return prev;
       });
       set(tab.id, { name, path });
@@ -118,7 +118,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   );
 
   const selectTab = useCallback((id: string) => {
-    setCurrent(id);
+    setCurrentId(id);
   }, []);
 
   const closeTab = useCallback((id: string, index: number) => {
@@ -126,7 +126,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       const newTabs = new Map(prevTabs);
       newTabs.delete(id);
 
-      setCurrent((prevCurrent) => {
+      setCurrentId((prevCurrent) => {
         if (prevCurrent !== id) return prevCurrent;
         const keys = Array.from(newTabs.keys());
         if (newTabs.size == 0) {
@@ -160,7 +160,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   }, []);
 
   const saveFile = useCallback(async () => {
-    const activeId = current;
+    const activeId = currenId;
     if (!activeId) return;
     setTabs((prevTabs) => {
       const t = prevTabs.get(activeId);
@@ -172,11 +172,11 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     });
     const existing = await get(activeId);
     existing && (await set(activeId, { ...existing, content: "" })); //clear content form store as file is save,
-  }, [current]);
+  }, [currenId]);
 
   const saveAsFile = useCallback(
     async (name: string, path: string) => {
-      const activeId = current;
+      const activeId = currenId;
       if (!activeId) return;
       setTabs((prevTabs) => {
         const t = prevTabs.get(activeId);
@@ -190,7 +190,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       existing &&
         (await set(activeId, { ...existing, name, path, content: "" })); //clear content form store as file is save,
     },
-    [current],
+    [currenId],
   );
 
   const toggleTheme = useCallback(async () => {
@@ -202,18 +202,18 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
 
   useEffect(() => {
     (async () => {
-      if (current) return;
+      if (currenId) return;
       if (tabs.size == 0) {
         const { id, tabs } = await getValues();
         if (tabs.size != 0) {
           setTabs(tabs);
-          id && setCurrent(id);
+          id && setCurrentId(id);
         } else {
           newTab();
         }
-      } else setCurrent(Array.from(tabs.keys())[0]);
+      } else setCurrentId(Array.from(tabs.keys())[0]);
     })();
-  }, [current]);
+  }, [currenId]);
 
   useEffect(() => {
     (async () => {
@@ -233,7 +233,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       tabs,
       theme,
       newTab,
-      currentId: current,
+      currentId,
       openFile,
       selectTab,
       text,
@@ -245,7 +245,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     [
       tabs,
       newTab,
-      current,
+      currenId,
       openFile,
       selectTab,
       text,
