@@ -69,7 +69,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   const { keys, set, remove, get } = OpenFileStore();
   const { get: getSettings, set: setSettings } = SettingsStore();
   const [tabs, setTabs] = useState<Map<string, Tab>>(new Map<string, Tab>());
-  const [currenId, setCurrentId] = useState<string>();
+  const [currentId, setCurrentId] = useState<string>();
   const [theme, setTheme] = useState<string>();
 
   const newTab = useCallback(() => {
@@ -160,7 +160,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   }, []);
 
   const saveFile = useCallback(async () => {
-    const activeId = currenId;
+    const activeId = currentId;
     if (!activeId) return;
     setTabs((prevTabs) => {
       const t = prevTabs.get(activeId);
@@ -172,11 +172,11 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     });
     const existing = await get(activeId);
     existing && (await set(activeId, { ...existing, content: "" })); //clear content form store as file is save,
-  }, [currenId]);
+  }, [currentId]);
 
   const saveAsFile = useCallback(
     async (name: string, path: string) => {
-      const activeId = currenId;
+      const activeId = currentId;
       if (!activeId) return;
       setTabs((prevTabs) => {
         const t = prevTabs.get(activeId);
@@ -190,7 +190,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       existing &&
         (await set(activeId, { ...existing, name, path, content: "" })); //clear content form store as file is save,
     },
-    [currenId],
+    [currentId],
   );
 
   const toggleTheme = useCallback(async () => {
@@ -202,7 +202,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
 
   useEffect(() => {
     (async () => {
-      if (currenId) return;
+      if (currentId) return;
       if (tabs.size == 0) {
         const { id, tabs } = await getValues();
         if (tabs.size != 0) {
@@ -213,7 +213,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
         }
       } else setCurrentId(Array.from(tabs.keys())[0]);
     })();
-  }, [currenId]);
+  }, [currentId]);
 
   useEffect(() => {
     (async () => {
@@ -245,7 +245,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     [
       tabs,
       newTab,
-      currenId,
+      currentId,
       openFile,
       selectTab,
       text,
