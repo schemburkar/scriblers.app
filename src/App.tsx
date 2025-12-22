@@ -4,6 +4,7 @@ import "./App.css";
 import { Tabs } from "./components/tabs";
 import { Textarea } from "./components/ui/textarea";
 import { TabProvider, useTabs } from "./components/tab-provider";
+import { Button } from "./components/ui/button";
 
 function App() {
   return (
@@ -23,15 +24,37 @@ function App() {
 }
 
 const Text = () => {
-  const { current, text } = useTabs();
+  const { currentId, text, tabs } = useTabs();
+  if (!currentId) return null;
+  const activeTab = tabs.get(currentId);
+  if (!activeTab) return null;
+  const { id, name, path, content, state } = activeTab;
   return (
-    <Textarea
-      onChange={(e) => {
-        text(e.target.value);
-      }}
-      value={current?.content}
-      className="whitespace-pre dark:bg-background/85 rounded-none focus-visible:ring-[1px] m-0.5 rounded-br border-none dark:border-none focus-visible:ring-black-200  resize-none font-mono flex overflow-auto p-2  h-full content-div w-[calc(100dvw-var(--sidebar-width))] group-has-data-[state='collapsed']/root:w-[calc(100dvw-var(--sidebar-width-icon))] "
-    ></Textarea>
+    <>
+      <Textarea
+        onChange={(e) => {
+          text(currentId, e.target.value);
+        }}
+        value={activeTab.content}
+        className="whitespace-pre dark:bg-background/85 rounded-none focus-visible:ring-[1px] m-0.5  border-none dark:border-none focus-visible:ring-black-200  resize-none font-mono flex overflow-auto p-2  h-full content-div w-[calc(100dvw-var(--sidebar-width))] group-has-data-[state='collapsed']/root:w-[calc(100dvw-var(--sidebar-width-icon))] "
+      ></Textarea>
+      <footer className="bg-accent text-xs flex py-0.5 px-1 gap-2">
+        <span>
+          <pre>{name}</pre>
+        </span>
+        <span className="border-r h-full" />
+        <span>
+          <pre>{path}</pre>
+        </span>
+        <span className="border-r h-full" />
+        <span>
+          <pre>
+            {state == "modified" ? "Edited" : state === "new" ? "New" : "Saved"}
+          </pre>
+        </span>
+        {/*<Button>a</Button>*/}
+      </footer>
+    </>
   );
 };
 export default App;

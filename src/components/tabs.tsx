@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, use } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,24 +26,40 @@ import { Button } from "./ui/button";
 import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
+  CircleSmallIcon,
   FileIcon,
   MoonIcon,
   NotebookIcon,
   SunIcon,
+  XIcon,
 } from "lucide-react";
-import { open } from "@tauri-apps/plugin-dialog";
-import { readTextFile } from "@tauri-apps/plugin-fs";
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { basename } from "@tauri-apps/api/path";
 
 import { useTabs } from "@/components/tab-provider";
 import { cn } from "@/lib/utils";
 
-const tab = {
-  name: "a",
-  state: "M",
-};
 export const Tabs = ({ children }: { children?: ReactNode }) => {
-  const { openFile, tabs, current, select, newTab } = useTabs();
+  const {
+    openFile,
+    tabs,
+    currentId,
+    selectTab,
+    newTab,
+    closeTab,
+    saveAsFile,
+    saveFile,
+    toggleTheme,
+  } = useTabs();
+
+  if (!currentId) return null;
+
+  const activeTab = tabs.get(currentId);
+
+  if (!activeTab) return null;
+
+  const { id, name, path, content, state } = activeTab;
   const onOpenFile = async () => {
     try {
       // Show the file picker dialog
@@ -66,6 +82,31 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
       console.error(err);
     }
   };
+
+  const onSaveFile = async () => {
+    try {
+      if (path) {
+        await writeTextFile(path, content);
+        saveFile();
+      } else {
+        const filePath = await save({
+          filters: [
+            { name: "Text", extensions: ["txt", "md"] },
+            { name: "JSON", extensions: ["json"] },
+            { name: "XML", extensions: ["xml", "xaml"] },
+          ],
+        });
+        if (filePath) {
+          await writeTextFile(filePath, content);
+          saveAsFile(await basename(filePath), filePath);
+        }
+      }
+
+      // You can use the file object to read its content
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <section>
       <TitleBar>
@@ -78,7 +119,7 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
             <MenubarContent>
               <MenubarItem onClick={() => onOpenFile()}>Open File</MenubarItem>
               <MenubarItem onClick={() => newTab()}>New File</MenubarItem>
-              <MenubarItem>New Window</MenubarItem>
+              <MenubarItem onClick={() => onSaveFile()}>Save</MenubarItem>
               <MenubarSeparator />
               <MenubarItem>Share</MenubarItem>
               <MenubarSeparator />
@@ -107,13 +148,13 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
         <SidebarProvider>
           <Sidebar collapsible="icon">
             <SidebarContent>
-              <SidebarGroup className="gap-1">
+              <SidebarGroup className="gap-1 overflow-hidden">
                 <SidebarRailToggle className="flex items-center">
                   <span className="grow group-data-[collapsible=icon]:hidden text-xs">
                     Files
                   </span>
                   <Button
-                    className="bg-background/50 w-8 group-data-[collapsible=icon]:w-full "
+                    className="bg-background/50 w-8 group-data-[collapsible=icon]:w-full size-6"
                     variant={"outline"}
                     size={"icon-sm"}
                   >
@@ -127,26 +168,51 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
                 </SidebarRailToggle>
 
                 <SidebarGroupContent>
-                  <SidebarMenu>
-                    {tabs.map((item, index) => (
-                      <SidebarMenuItem
-                        onClick={() => select(item)}
-                        data-is-selected={item.id === current?.id}
-                        className={cn(
-                          "border border-transparent rounded ",
-                          item.id === current?.id
-                            ? " border-border bg-accent"
-                            : "",
-                        )}
-                        key={`${index}-${item.id}`}
-                      >
-                        <SidebarMenuButton className="text-xs">
-                          <FileIcon />
-                          {item.name}
-                        </SidebarMenuButton>
-                        <SidebarMenuBadge>{item.state}</SidebarMenuBadge>
-                      </SidebarMenuItem>
-                    ))}
+                  <SidebarMenu className="h-[calc(100vh-8rem)] overflow-auto">
+                    {Array.from(tabs.keys()).map((key, index) => {
+                      const item = tabs.get(key);
+                      if (!item) return;
+                      return (
+                        <SidebarMenuItem
+                          title={`${item.name}`}
+                          onClick={() => selectTab(item.id)}
+                          data-is-selected={item.id === id}
+                          className={cn(
+                            " border border-transparent rounded flex hover:[&_.badge]:hidden hover:[&_.close]:bg-accent not-hover:[&_.close]:hidden pr-2  hover:bg-accent/90",
+                            item.id === id ? " border-border bg-accent" : "",
+                          )}
+                          key={`${index}-${item.id}`}
+                        >
+                          <SidebarMenuButton className="text-xs pl-1! group-data-[collapsible=icon]:whitespace-nowrap group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:truncate">
+                            <FileIcon />
+                            {item.name}
+                          </SidebarMenuButton>
+                          <SidebarMenuBadge className="badge">
+                            {item.state == "modified" ? (
+                              <CircleSmallIcon className="fill-amber-300 stroke-0 size-4" />
+                            ) : item.state == "new" ? (
+                              <CircleSmallIcon className="fill-lime-300 stroke-0 size-4" />
+                            ) : null}
+                          </SidebarMenuBadge>
+                          <SidebarMenuBadge
+                            className="close pointer-events-auto"
+                            title={`Close ${item.name}`}
+                          >
+                            <Button
+                              className="size-4 cursor-pointer [&_svg]:stroke-accent-foreground/50 hover:[&_svg]:stroke-destructive"
+                              variant={"ghost"}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                closeTab(item.id, index);
+                              }}
+                            >
+                              <XIcon className="ml-1.5" />
+                            </Button>
+                          </SidebarMenuBadge>
+                        </SidebarMenuItem>
+                      );
+                    })}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
@@ -156,11 +222,7 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
                 className="bg-background/50  size-6"
                 variant={"outline"}
                 size={"icon-sm"}
-                onClick={() =>
-                  !document.documentElement.classList.contains("dark")
-                    ? document.documentElement.classList.add("dark")
-                    : document.documentElement.classList.remove("dark")
-                }
+                onClick={toggleTheme}
               >
                 <SunIcon className="not-dark:hidden" />
                 <MoonIcon className="dark:hidden" />
@@ -170,9 +232,15 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
         </SidebarProvider>
         {/*{current?.id}*/}
         {/*{JSON.stringify(tabs.map((a) => a.name))}*/}
+        {/*{JSON.stringify(tabs.map((a) => a.path))}*/}
         {/*JSON.stringify(current?.name)}*/}
         {children}
       </main>
+      {/*<div className=" sticky bottom-0 flex gap-4 right-0">
+        <span>{path}</span>
+        <span>{name}</span>
+        <span>{state || "-"}</span>
+      </div>*/}
     </section>
   );
 };

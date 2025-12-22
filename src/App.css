@@ -136,3 +136,14 @@ body {
 /**[data-slot="sidebar-inner"] {
     @apply h-[calc(100%-2.5rem)];
 }*/
+
+/* Chrome, Safari, and Opera */
+[data-collapsible="icon"] [data-slot="sidebar-menu"]::-webkit-scrollbar {
+    display: none;
+}
+[data-collapsible="icon"] [data-slot="sidebar-menu"] {
+    /* IE and Edge */
+    -ms-overflow-style: none;
+    /* Firefox */
+    scrollbar-width: none;
+}
