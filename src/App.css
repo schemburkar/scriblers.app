@@ -129,7 +129,7 @@
 }
 
 body {
-    @apply h-lvh flex m-0 flex-col bg-background/35
+    @apply h-lvh flex m-0 flex-col
     /*backdrop-filter: var(--background);*/;
 }
 

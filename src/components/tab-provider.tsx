@@ -33,7 +33,18 @@ export const useTabs = () => {
 
   return context;
 };
-type Tab = {
+
+export const useActiveTab = () => {
+  const { tabs, currentId } = useTabs();
+  if (!currentId) return null;
+  const activeTab = tabs.get(currentId);
+  if (!activeTab) return null;
+
+  const { id, name, path, content, state } = activeTab;
+  return { id, name, path, content, state };
+};
+
+export type Tab = {
   id: string;
   name: string;
   content: string;
@@ -66,7 +77,7 @@ const getValues = async () => {
   return { id, tabs };
 };
 export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
-  const { keys, set, remove, get } = OpenFileStore();
+  const { set, remove, get } = OpenFileStore();
   const { get: getSettings, set: setSettings } = SettingsStore();
   const [tabs, setTabs] = useState<Map<string, Tab>>(new Map<string, Tab>());
   const [currentId, setCurrentId] = useState<string>();

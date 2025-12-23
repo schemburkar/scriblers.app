@@ -1,15 +1,6 @@
-import { ReactNode } from "react";
 import { Button } from "./ui/button";
 import { SquareIcon, MinusIcon, XIcon } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-
-export const TitleBar = ({ children }: { children: ReactNode }) => {
-  return (
-    <div data-tauri-drag-region className="flex  ">
-      {children}
-    </div>
-  );
-};
 
 const getWindow = () => {
   try {
@@ -18,7 +9,7 @@ const getWindow = () => {
     return null;
   }
 };
-export const TitleBarButtons = ({ children }: { children?: ReactNode }) => {
+export const TitleBarButtons = () => {
   const appWindow = getWindow();
 
   return (
