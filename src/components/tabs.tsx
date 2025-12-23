@@ -27,7 +27,9 @@ import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
   CircleSmallIcon,
+  FileCodeIcon,
   FileIcon,
+  FileJsonIcon,
   MoonIcon,
   NotebookIcon,
   SunIcon,
@@ -107,6 +109,7 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
       console.error(err);
     }
   };
+
   return (
     <section>
       <TitleBar>
@@ -184,7 +187,14 @@ export const Tabs = ({ children }: { children?: ReactNode }) => {
                           key={`${index}-${item.id}`}
                         >
                           <SidebarMenuButton className="text-xs pl-1! group-data-[collapsible=icon]:whitespace-nowrap group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:truncate">
-                            <FileIcon />
+                            {item.name.endsWith(".json") ? (
+                              <FileJsonIcon />
+                            ) : item.name.endsWith(".xml") ? (
+                              <FileCodeIcon />
+                            ) : (
+                              <FileIcon />
+                            )}
+
                             {item.name}
                           </SidebarMenuButton>
                           <SidebarMenuBadge className="badge">
