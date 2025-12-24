@@ -21,7 +21,7 @@ type TabContextProps = {
   saveAsFile: (name: string, path: string) => void;
   closeTab: (id: string, index?: number) => void;
   toggleTheme: () => void;
-  duplicate: () => void;
+  duplicate: (id: string) => void;
 };
 
 const TabContext = createContext<TabContextProps | null>(null);
@@ -225,7 +225,22 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     await setSettings("theme", nextTheme);
   }, [theme]);
 
-  const duplicate = () => {};
+  const duplicate = (id: string) => {
+    var tab = { ...tabs.get(id)!, id: crypto.randomUUID() };
+
+    setTabs((prev) => {
+      const newTabs = new Map(prev);
+      newTabs.set(tab.id, tab);
+      return newTabs;
+    });
+
+    setCurrentId(tab.id);
+    set(tab.id, {
+      name: tab.name,
+      path: tab.path,
+      content: tab.state == "" ? "" : tab.content,
+    });
+  };
 
   useEffect(() => {
     (async () => {

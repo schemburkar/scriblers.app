@@ -5,7 +5,11 @@ import { Textarea } from "./ui/textarea";
 import { useZoom } from "./zoom-provider";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import { TextAreaClassName } from "../lib/text-area-helper";
+import {
+  getSelection,
+  setSelection,
+  TextAreaClassName,
+} from "../lib/text-area-helper";
 
 export const Text = () => {
   const { currentId, text, tabs } = useTabs();
@@ -55,6 +59,26 @@ export const Text = () => {
         }}
         //  ref={ref}
         spellCheck={spellCheck}
+        onKeyDown={(e) => {
+          if (e.key === "Tab") {
+            e.preventDefault();
+
+            const [start, end] = getSelection();
+
+            const newValue =
+              e.currentTarget.value.substring(0, start) +
+              `\t` +
+              e.currentTarget.value.substring(end);
+            text(currentId, newValue);
+
+            window.requestAnimationFrame(() =>
+              setSelection(start + 1, start + 1),
+            );
+          }
+          if (e.key === "Escape") {
+            e.currentTarget.blur();
+          }
+        }}
         onChange={(e) => {
           text(currentId, e.target.value);
         }}

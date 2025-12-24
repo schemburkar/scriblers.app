@@ -63,15 +63,15 @@ export const Tabs = () => {
                 })}
               </SidebarMenu>
             </SidebarGroupContent>
-            <ButtonGroup className="self-center group-data-[collapsible=icon]:flex-col font-normal">
+            <ButtonGroup className="w-full group-data-[collapsible=icon]:flex-col font-normal bg-accent">
               <Button
                 title="New Tab"
                 onClick={newTab}
-                className="bg-background/50 px-1!  text-xs group-data-[collapsible=icon]:rounded-t! group-data-[collapsible=icon]:rounded-b-none group-data-[collapsible=icon]:border-t"
+                className="bg-background/50 px-1! not-group-data-[collapsible=icon]:w-1/2 text-xs group-data-[collapsible=icon]:rounded-t! group-data-[collapsible=icon]:rounded-b-none group-data-[collapsible=icon]:border-t"
                 variant={"outline"}
                 size={"sm"}
               >
-                <PlusIcon className="size-3 group-data-[collapsible=icon]:size-4 group-data-[collapsible=icon]:w-full" />
+                <PlusIcon className="size-3 group-data-[collapsible=icon]:size-3.5 group-data-[collapsible=icon]:w-full" />
                 <span className="group-data-[collapsible=icon]:hidden font-normal">
                   New Tab
                 </span>
@@ -79,11 +79,11 @@ export const Tabs = () => {
               <Button
                 title="Open File"
                 onClick={onOpenFile}
-                className="bg-background/50 px-1! pl-1.5! text-xs group-data-[collapsible=icon]:rounded-b! group-data-[collapsible=icon]:rounded-t-none! group-data-[collapsible=icon]:border-l! group-data-[collapsible=icon]:border-t-0!"
+                className="bg-background/50 px-1! not-group-data-[collapsible=icon]:w-1/2 pl-1.5! text-xs group-data-[collapsible=icon]:rounded-b! group-data-[collapsible=icon]:rounded-t-none! group-data-[collapsible=icon]:border-l! group-data-[collapsible=icon]:border-t-0!"
                 variant={"outline"}
                 size={"sm"}
               >
-                <FolderOpenIcon className="size-3 group-data-[collapsible=icon]:size-4 group-data-[collapsible=icon]:w-full" />
+                <FolderOpenIcon className="size-3 group-data-[collapsible=icon]:size-3.5 group-data-[collapsible=icon]:w-full" />
                 <span className="group-data-[collapsible=icon]:hidden font-normal">
                   Open File
                 </span>

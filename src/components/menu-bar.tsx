@@ -5,6 +5,7 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
+  MenubarShortcut,
   MenubarTrigger,
 } from "./ui/menubar";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
@@ -20,6 +21,7 @@ import {
 } from "../lib/text-area-helper";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { onOpenFileDialog, onSaveFileDialog } from "@/lib/file-dialog-helper";
+import { useKeyboardShortcuts } from "@/lib/tab-switch";
 export const MenuBar = ({
   title,
   children,
@@ -36,6 +38,7 @@ export const MenuBar = ({
     saveFile,
     text,
     closeTab,
+    duplicate,
   } = useTabs();
 
   const {
@@ -125,6 +128,13 @@ export const MenuBar = ({
       console.error(err);
     }
   };
+  useKeyboardShortcuts({
+    newTab,
+    onSaveFile,
+    closeTab,
+    toggleTheme,
+    currentId,
+  });
 
   return (
     <Menubar
@@ -135,11 +145,20 @@ export const MenuBar = ({
       <MenubarMenu>
         <MenubarTrigger>File</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem onClick={() => newTab()}>New File</MenubarItem>
+          <MenubarItem onClick={() => newTab()}>
+            New File<MenubarShortcut>Ctrl + N</MenubarShortcut>
+            {/*⌘*/}
+          </MenubarItem>
           <MenubarItem onClick={() => onOpenFile()}>Open File</MenubarItem>
-          <MenubarItem onClick={() => onSaveFile()}>Save</MenubarItem>
-          <MenubarItem onClick={() => onSaveFile(true)}>Save As</MenubarItem>
-          <MenubarItem onClick={() => {}}>Duplicate</MenubarItem>
+          <MenubarItem onClick={() => onSaveFile()}>
+            Save<MenubarShortcut>Ctrl + S</MenubarShortcut>
+          </MenubarItem>
+          <MenubarItem onClick={() => onSaveFile(true)}>
+            Save As<MenubarShortcut>Ctrl + Shift + S</MenubarShortcut>
+          </MenubarItem>
+          <MenubarItem onClick={() => duplicate(currentId!)}>
+            Duplicate
+          </MenubarItem>
           <MenubarItem disabled={!path} onClick={reloadFile}>
             Reload File
           </MenubarItem>
@@ -155,7 +174,7 @@ export const MenuBar = ({
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={() => closeTab(currentId!)}>
-            Close tab
+            Close tab<MenubarShortcut>Ctrl + W</MenubarShortcut>
           </MenubarItem>
           <MenubarItem onClick={() => getCurrentWindow().close()}>
             Close window
@@ -180,7 +199,9 @@ export const MenuBar = ({
           <MenubarItem onClick={zoomOut}>Zoom Out</MenubarItem>
           <MenubarItem onClick={reset}>Reset Zoom</MenubarItem>
           <MenubarSeparator />
-          <MenubarItem onClick={toggleTheme}>Toggle Theme</MenubarItem>
+          <MenubarItem onClick={toggleTheme}>
+            Toggle Theme<MenubarShortcut>Ctrl + T</MenubarShortcut>
+          </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={toggleWordWrap}>
             Word wrap
