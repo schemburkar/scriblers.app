@@ -53,7 +53,7 @@ export const Tabs = () => {
                 {Array.from(tabs.keys()).map((key, index) => {
                   const item = tabs.get(key);
                   if (!item) return;
-                  return <FileTab item={item} index={index} />;
+                  return <FileTab key={key} item={item} index={index} />;
                 })}
               </SidebarMenu>
             </SidebarGroupContent>

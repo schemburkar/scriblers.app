@@ -3,23 +3,70 @@ import { useTabs } from "./tab-provider";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { useZoom } from "./zoom-provider";
+import { cn } from "@/lib/utils";
+import { useEffect } from "react";
+import { TextAreaClassName } from "../lib/text-area-helper";
 
 export const Text = () => {
   const { currentId, text, tabs } = useTabs();
-  const { zoom, zoomIn, zoomOut } = useZoom();
+  const { zoom, zoomIn, zoomOut, spellCheck, wordWrap } = useZoom();
+  // const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!currentId) return;
+    const t = document.querySelector(".textarea") as HTMLTextAreaElement;
+    t.removeAttribute("selectionStart");
+    t.removeAttribute("selectionEnd");
+  }, [currentId]);
+
   if (!currentId) return null;
   const activeTab = tabs.get(currentId);
   if (!activeTab) return null;
   const { name, path, state } = activeTab;
+
   return (
     <>
       <Textarea
+        autoFocus
+        onSelect={(e) => {
+          e.currentTarget.setAttribute(
+            "selectionStart",
+            e.currentTarget.selectionStart.toString(),
+          );
+
+          e.currentTarget.setAttribute(
+            "selectionEnd",
+            e.currentTarget.selectionEnd.toString(),
+          );
+        }}
+        onFocusCapture={(e) => {
+          const start = e.currentTarget.getAttribute("selectionStart");
+          const end = e.currentTarget.getAttribute("selectionEnd");
+
+          start &&
+            end &&
+            setTimeout(
+              () =>
+                (
+                  document.querySelector(".textarea") as HTMLTextAreaElement
+                )?.setSelectionRange(+start, +end),
+              5,
+            );
+        }}
+        //  ref={ref}
+        spellCheck={spellCheck}
         onChange={(e) => {
           text(currentId, e.target.value);
         }}
         value={activeTab.content}
         style={{ zoom: zoom / 100 }}
-        className=" whitespace-pre dark:bg-background/85 rounded-none focus-visible:ring-[1px] m-0.5  border-none dark:border-none focus-visible:ring-secondary-foreground/50  resize-none font-mono flex overflow-auto p-2  h-full content-div w-[calc(100dvw-var(--sidebar-width))] group-has-data-[state='collapsed']/root:w-[calc(100dvw-var(--sidebar-width-icon))] "
+        className={cn(
+          TextAreaClassName,
+          wordWrap ? "whitespace-normal" : " whitespace-pre",
+          "dark:bg-background/85 rounded-none focus-visible:ring-[1px]  border-none focus-visible:ring-secondary-foreground/50 ",
+          "selection:bg-blue-100 dark:selection:bg-sky-800 ",
+          " resize-none font-mono flex overflow-auto p-2  m-0.5 h-full content-div w-[calc(100dvw-var(--sidebar-width))] group-has-data-[state='collapsed']/root:w-[calc(100dvw-var(--sidebar-width-icon))] ",
+        )}
       ></Textarea>
       <footer className="bg-accent text-xs flex py-0.5 px-1 gap-2   ">
         <span>
