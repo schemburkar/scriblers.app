@@ -76,6 +76,18 @@ export const MenuBar = ({
       console.error(err);
     }
   };
+
+  const reloadFile = async () => {
+    try {
+      if (!path) return;
+
+      const data = await readTextFile(path);
+      text(currentId!, data, true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const copy = async () => {
     const textarea = TextAreaElement();
     const [start, end] = getSelection();
@@ -161,6 +173,7 @@ export const MenuBar = ({
           <MenubarItem onClick={() => onSaveFile()}>Save</MenubarItem>
           <MenubarItem onClick={() => onSaveFile(true)}>Save As</MenubarItem>
           <MenubarItem onClick={() => {}}>Duplicate</MenubarItem>
+          <MenubarItem onClick={reloadFile}>Reload File</MenubarItem>
           <MenubarSeparator />
           <MenubarItem>Copy Path</MenubarItem>
           <MenubarItem>Copy File Name</MenubarItem>

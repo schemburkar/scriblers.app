@@ -16,7 +16,7 @@ type TabContextProps = {
   newTab: () => void;
   openFile: (name: string, content: string, path: string) => void;
   selectTab: (id: string) => void;
-  text: (id: string, text: string) => void;
+  text: (id: string, text: string, reset?: true | undefined) => void;
   saveFile: () => void;
   saveAsFile: (name: string, path: string) => void;
   closeTab: (id: string, index: number) => void;
@@ -152,23 +152,31 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     remove(id);
   }, []);
 
-  const text = useCallback(async (id: string, txt: string) => {
-    setTabs((prevTabs) => {
-      const newTabs = new Map(prevTabs);
-      const t = prevTabs.get(id);
-      if (!t) return newTabs;
+  const text = useCallback(
+    async (id: string, txt: string, reset?: true | undefined) => {
+      setTabs((prevTabs) => {
+        const newTabs = new Map(prevTabs);
+        const t = prevTabs.get(id);
+        if (!t) return newTabs;
 
-      newTabs.set(id, {
-        ...t,
-        content: txt,
-        state: t.state == "new" ? "new" : "modified",
+        newTabs.set(id, {
+          ...t,
+          content: txt,
+          state: reset ? "" : t.state == "new" ? "new" : "modified",
+        });
+        return newTabs;
       });
-      return newTabs;
-    });
 
-    const existing = await get(id);
-    existing && (await set(id, { ...existing, content: txt }));
-  }, []);
+      const existing = await get(id);
+      existing &&
+        (await set(id, {
+          ...existing,
+          content: txt,
+          ...(reset ? { state: "" } : {}),
+        }));
+    },
+    [],
+  );
 
   const saveFile = useCallback(async () => {
     const activeId = currentId;
