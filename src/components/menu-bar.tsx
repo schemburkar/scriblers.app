@@ -53,17 +53,6 @@ export const MenuBar = ({
 
   const onOpenFile = async () => {
     try {
-      const copyItem = await PredefinedMenuItem.new({
-        item: "Find",
-      });
-
-      const menu = await Menu.new({
-        items: [copyItem],
-      });
-
-      await menu.setAsAppMenu();
-      menu.popup();
-      return;
       // Show the file picker dialog
       const file = await open({
         multiple: false,
@@ -73,6 +62,7 @@ export const MenuBar = ({
           { name: "JSON", extensions: ["json"] },
           { name: "XML", extensions: ["xml", "xaml"] },
           { name: "HTML", extensions: ["htm", "html"] },
+          { name: "All files", extensions: ["*"] },
         ],
       });
       console.log(file);
@@ -142,6 +132,7 @@ export const MenuBar = ({
             { name: "JSON", extensions: ["json"] },
             { name: "XML", extensions: ["xml", "xaml"] },
             { name: "HTML", extensions: ["htm", "html"] },
+            { name: "All files", extensions: ["*"] },
           ],
         });
         if (filePath) {
