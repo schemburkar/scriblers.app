@@ -21,7 +21,7 @@ type TabContextProps = {
   saveAsFile: (name: string, path: string) => void;
   closeTab: (id: string, index?: number) => void;
   toggleTheme: () => void;
-  duplicate:()
+  duplicate: () => void;
 };
 
 const TabContext = createContext<TabContextProps | null>(null);
@@ -225,6 +225,8 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     await setSettings("theme", nextTheme);
   }, [theme]);
 
+  const duplicate = () => {};
+
   useEffect(() => {
     (async () => {
       if (currentId) return;
@@ -266,6 +268,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       saveFile,
       saveAsFile,
       toggleTheme,
+      duplicate,
     }),
     [
       tabs,
@@ -278,6 +281,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       saveFile,
       saveAsFile,
       toggleTheme,
+      duplicate,
     ],
   );
 

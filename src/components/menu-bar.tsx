@@ -7,9 +7,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "./ui/menubar";
-import { open, save } from "@tauri-apps/plugin-dialog";
 import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import { basename } from "@tauri-apps/api/path";
 import { useActiveTab, useTabs } from "./tab-provider";
 import { useZoom } from "./zoom-provider";
 import { SidebarMenuBadge } from "./sidebar";
