@@ -13,18 +13,24 @@ import { Button } from "./ui/button";
 import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
+  FolderOpenIcon,
   MoonIcon,
+  PlusIcon,
   SunIcon,
 } from "lucide-react";
 
 import { useTabs } from "@/components/tab-provider";
 import { FileTab } from "./file-tab";
+import { ButtonGroup } from "./ui/button-group";
+import { onOpenFileDialog } from "@/lib/file-dialog-helper";
 
 export const Tabs = () => {
-  const { tabs, currentId, toggleTheme } = useTabs();
+  const { tabs, currentId, toggleTheme, newTab, openFile } = useTabs();
 
   if (!currentId) return null;
-
+  const onOpenFile = async () => {
+    await onOpenFileDialog((name, data, path) => openFile(name, data, path));
+  };
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -49,7 +55,7 @@ export const Tabs = () => {
             </SidebarRailToggle>
 
             <SidebarGroupContent>
-              <SidebarMenu className="h-[calc(100vh-7.5rem)] overflow-auto">
+              <SidebarMenu className="max-h-[calc(100vh-7.5rem)] overflow-auto">
                 {Array.from(tabs.keys()).map((key, index) => {
                   const item = tabs.get(key);
                   if (!item) return;
@@ -57,6 +63,32 @@ export const Tabs = () => {
                 })}
               </SidebarMenu>
             </SidebarGroupContent>
+            <ButtonGroup className="self-center group-data-[collapsible=icon]:flex-col font-normal">
+              <Button
+                title="New Tab"
+                onClick={newTab}
+                className="bg-background/50 px-1!  text-xs group-data-[collapsible=icon]:rounded-t! group-data-[collapsible=icon]:rounded-b-none group-data-[collapsible=icon]:border-t"
+                variant={"outline"}
+                size={"sm"}
+              >
+                <PlusIcon className="size-3 group-data-[collapsible=icon]:size-4 group-data-[collapsible=icon]:w-full" />
+                <span className="group-data-[collapsible=icon]:hidden font-normal">
+                  New Tab
+                </span>
+              </Button>
+              <Button
+                title="Open File"
+                onClick={onOpenFile}
+                className="bg-background/50 px-1! pl-1.5! text-xs group-data-[collapsible=icon]:rounded-b! group-data-[collapsible=icon]:rounded-t-none! group-data-[collapsible=icon]:border-l! group-data-[collapsible=icon]:border-t-0!"
+                variant={"outline"}
+                size={"sm"}
+              >
+                <FolderOpenIcon className="size-3 group-data-[collapsible=icon]:size-4 group-data-[collapsible=icon]:w-full" />
+                <span className="group-data-[collapsible=icon]:hidden font-normal">
+                  Open File
+                </span>
+              </Button>
+            </ButtonGroup>
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter className="">

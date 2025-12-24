@@ -20,6 +20,8 @@ import {
   getSelection,
   setSelection,
 } from "../lib/text-area-helper";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { onOpenFileDialog, onSaveFileDialog } from "@/lib/file-dialog-helper";
 export const MenuBar = ({
   title,
   children,
@@ -35,6 +37,7 @@ export const MenuBar = ({
     saveAsFile,
     saveFile,
     text,
+    closeTab,
   } = useTabs();
 
   const {
@@ -49,32 +52,10 @@ export const MenuBar = ({
   const activeTab = useActiveTab();
   if (!activeTab) return null;
 
-  const { path, content } = activeTab;
+  const { name, path, content } = activeTab;
 
   const onOpenFile = async () => {
-    try {
-      // Show the file picker dialog
-      const file = await open({
-        multiple: false,
-        directory: false,
-        filters: [
-          { name: "Text", extensions: ["txt", "md"] },
-          { name: "JSON", extensions: ["json"] },
-          { name: "XML", extensions: ["xml", "xaml"] },
-          { name: "HTML", extensions: ["htm", "html"] },
-          { name: "All files", extensions: ["*"] },
-        ],
-      });
-      console.log(file);
-
-      if (!file) return;
-      const data = await readTextFile(file);
-      openFile(await basename(file), data, file);
-
-      // You can use the file object to read its content
-    } catch (err) {
-      console.error(err);
-    }
+    await onOpenFileDialog((name, data, path) => openFile(name, data, path));
   };
 
   const reloadFile = async () => {
@@ -138,19 +119,7 @@ export const MenuBar = ({
         await writeTextFile(path, content);
         saveFile();
       } else {
-        const filePath = await save({
-          filters: [
-            { name: "Text", extensions: ["txt", "md"] },
-            { name: "JSON", extensions: ["json"] },
-            { name: "XML", extensions: ["xml", "xaml"] },
-            { name: "HTML", extensions: ["htm", "html"] },
-            { name: "All files", extensions: ["*"] },
-          ],
-        });
-        if (filePath) {
-          await writeTextFile(filePath, content);
-          saveAsFile(await basename(filePath), filePath);
-        }
+        onSaveFileDialog(content, (name, path) => saveAsFile(name, path));
       }
 
       // You can use the file object to read its content
@@ -173,13 +142,26 @@ export const MenuBar = ({
           <MenubarItem onClick={() => onSaveFile()}>Save</MenubarItem>
           <MenubarItem onClick={() => onSaveFile(true)}>Save As</MenubarItem>
           <MenubarItem onClick={() => {}}>Duplicate</MenubarItem>
-          <MenubarItem onClick={reloadFile}>Reload File</MenubarItem>
+          <MenubarItem disabled={!path} onClick={reloadFile}>
+            Reload File
+          </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem>Copy Path</MenubarItem>
-          <MenubarItem>Copy File Name</MenubarItem>
+          <MenubarItem
+            disabled={!path}
+            onClick={async () => await writeText(path!)}
+          >
+            Copy Path
+          </MenubarItem>
+          <MenubarItem onClick={async () => await writeText(name)}>
+            Copy File Name
+          </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem>Close tab</MenubarItem>
-          <MenubarItem>Close window</MenubarItem>
+          <MenubarItem onClick={() => closeTab(currentId!)}>
+            Close tab
+          </MenubarItem>
+          <MenubarItem onClick={() => getCurrentWindow().close()}>
+            Close window
+          </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>

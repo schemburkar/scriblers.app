@@ -19,8 +19,9 @@ type TabContextProps = {
   text: (id: string, text: string, reset?: true | undefined) => void;
   saveFile: () => void;
   saveAsFile: (name: string, path: string) => void;
-  closeTab: (id: string, index: number) => void;
+  closeTab: (id: string, index?: number) => void;
   toggleTheme: () => void;
+  duplicate:()
 };
 
 const TabContext = createContext<TabContextProps | null>(null);
@@ -132,7 +133,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     setCurrentId(id);
   }, []);
 
-  const closeTab = useCallback((id: string, index: number) => {
+  const closeTab = useCallback((id: string, index?: number) => {
     setTabs((prevTabs) => {
       const newTabs = new Map(prevTabs);
       newTabs.delete(id);
@@ -143,6 +144,11 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
         if (newTabs.size == 0) {
           return ""; // effect should handle current change
         } else {
+          if (!index) {
+            index = Array.from(prevTabs.keys()).findIndex((a) => a === id);
+            if (index === -1)
+              throw new Error("Ivalid opeation: Index out of bounds");
+          }
           return keys[index] || keys[index - 1];
         }
       });
