@@ -9,7 +9,6 @@ import {
   Moon,
   Sun,
   ArrowRight,
-  Laptop,
   LucideProps,
 } from "lucide-react";
 

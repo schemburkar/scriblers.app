@@ -16,7 +16,12 @@ type TabContextProps = {
   newTab: () => void;
   openFile: (name: string, content: string, path: string) => void;
   selectTab: (id: string) => void;
-  text: (id: string, text: string, reset?: true | undefined) => void;
+  text: (
+    id: string,
+    text: string,
+    reset?: true | undefined,
+    edited?: true | undefined,
+  ) => void;
   saveFile: () => void;
   saveAsFile: (name: string, path: string) => void;
   closeTab: (id: string, index?: number) => void;
@@ -159,7 +164,12 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   }, []);
 
   const text = useCallback(
-    async (id: string, txt: string, reset?: true | undefined) => {
+    async (
+      id: string,
+      txt: string,
+      reset?: true | undefined,
+      edited?: true | undefined,
+    ) => {
       setTabs((prevTabs) => {
         const newTabs = new Map(prevTabs);
         const t = prevTabs.get(id);
@@ -168,7 +178,13 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
         newTabs.set(id, {
           ...t,
           content: txt,
-          state: reset ? "" : t.state == "new" ? "new" : "modified",
+          state: reset
+            ? ""
+            : edited
+              ? t.state == "new"
+                ? "new"
+                : "modified"
+              : t.state,
         });
         return newTabs;
       });

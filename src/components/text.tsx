@@ -60,7 +60,7 @@ export const Text = () => {
         //  ref={ref}
         spellCheck={spellCheck}
         onKeyDown={(e) => {
-          if (e.key === "Tab") {
+          if (e.key === "Tab" && !e.ctrlKey) {
             e.preventDefault();
 
             const [start, end] = getSelection();
@@ -80,7 +80,7 @@ export const Text = () => {
           }
         }}
         onChange={(e) => {
-          text(currentId, e.target.value);
+          text(currentId, e.target.value, undefined, true);
         }}
         value={activeTab.content}
         style={{ zoom: zoom / 100 }}

@@ -51,6 +51,30 @@ export const MenuBar = ({
     toggleWordWrap,
   } = useZoom();
   const activeTab = useActiveTab();
+
+  const onSaveFile = async (createCopy?: boolean) => {
+    try {
+      if (!createCopy && path) {
+        await writeTextFile(path, content);
+        saveFile();
+      } else {
+        onSaveFileDialog(content, (name, path) => saveAsFile(name, path));
+      }
+
+      // You can use the file object to read its content
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useKeyboardShortcuts({
+    newTab,
+    onSaveFile,
+    closeTab,
+    toggleTheme,
+    currentId,
+  });
+
   if (!activeTab) return null;
 
   const { name, path, content } = activeTab;
@@ -88,7 +112,7 @@ export const MenuBar = ({
     const [start, end] = getSelection();
 
     const newValue = `${textarea.value.substring(0, +start)}${copiedText}${textarea.value.substring(+end)}`;
-    text(currentId!, newValue);
+    text(currentId!, newValue, undefined, true);
 
     const newCursorPos = start + copiedText.length;
     setSelection(newCursorPos, newCursorPos);
@@ -104,7 +128,7 @@ export const MenuBar = ({
     if (selectedText) {
       await writeText(selectedText);
       const newValue = `${textarea.value.substring(0, start)}${textarea.value.substring(end)}`;
-      text(currentId!, newValue);
+      text(currentId!, newValue, undefined, true);
 
       setSelection(start, start);
     }
@@ -114,27 +138,6 @@ export const MenuBar = ({
     const textarea = TextAreaElement();
     setSelection(0, textarea.value.length);
   };
-  const onSaveFile = async (createCopy?: boolean) => {
-    try {
-      if (!createCopy && path) {
-        await writeTextFile(path, content);
-        saveFile();
-      } else {
-        onSaveFileDialog(content, (name, path) => saveAsFile(name, path));
-      }
-
-      // You can use the file object to read its content
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  useKeyboardShortcuts({
-    newTab,
-    onSaveFile,
-    closeTab,
-    toggleTheme,
-    currentId,
-  });
 
   return (
     <Menubar
