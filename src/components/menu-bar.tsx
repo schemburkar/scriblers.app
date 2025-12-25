@@ -188,7 +188,7 @@ export const MenuBar = ({
           <MenubarItem onClick={copy}>Copy</MenubarItem>
           <MenubarItem onClick={paste}>Paste</MenubarItem>
           <MenubarSeparator />
-          <MenubarItem>Find</MenubarItem>
+          <MenubarItem disabled>Find</MenubarItem>
           <MenubarItem onClick={selectAll}>Select All</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
