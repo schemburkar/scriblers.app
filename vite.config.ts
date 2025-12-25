@@ -38,4 +38,7 @@ export default defineConfig(async ({ mode }) => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    outDir: mode === "web" ? "dist-web" : "dist",
+  },
 }));

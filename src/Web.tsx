@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState, useEffect, ReactNode, ReactElement } from "react";
+import React, { useState, ReactNode, ReactElement } from "react";
 import {
   Download,
   Monitor,
@@ -11,6 +11,8 @@ import {
   ArrowRight,
   LucideProps,
 } from "lucide-react";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import SmartScreenWarning from "./download-thanks";
 
 const ScriblersLanding = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -20,35 +22,7 @@ const ScriblersLanding = () => {
   const DOWNLOAD_EXE = "#";
 
   return (
-    <div
-      className={`min-h-screen ${isDarkMode ? "bg-slate-950 text-white dark" : "bg-slate-50 text-slate-900"} transition-colors duration-300 font-sans`}
-    >
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className=" p-2 rounded-lg">
-            <img className="size-8" src="src/assets/Square71x71Logo.png" />
-            {/*<Layout size={24} className="text-white" />*/}
-          </div>
-          <span className="text-2xl font-bold tracking-tight">Scriblers</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800  transition-colors"
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <a
-            href="#download"
-            className="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-full font-medium transition-all"
-          >
-            Download
-          </a>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
+    <>
       <header className="max-w-7xl mx-auto px-8 pt-20 pb-32 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-sky-600 dark:text-sky-400 px-4 py-1.5 rounded-full text-sm font-medium mb-8">
           <span className="relative flex h-2 w-2">
@@ -143,26 +117,78 @@ const ScriblersLanding = () => {
             </ul>
           </div>
           <div
-            className={`aspect-video rounded-2xl border ${isDarkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-slate-200"} flex items-center justify-center shadow-2xl`}
+            className={`aspect-video rounded-md flex items-center justify-center  shadow-2xl`}
           >
             <span className="text-slate-500 font-mono italic">
-              [ App Screenshot Placeholder ]
+              <img
+                src="/dark-app.png"
+                className="not-dark:hidden p-1 rounded-md"
+              />
+              <img
+                src="/light-app.png"
+                className="dark:hidden p-1 rounded-md"
+              />
             </span>
           </div>
         </div>
       </section>
+    </>
+  );
+};
 
-      {/* Footer */}
+const Layout1 = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Download links - update these with your actual hosted URLs
+  const DOWNLOAD_MSI = "#";
+  const DOWNLOAD_EXE = "#";
+
+  return (
+    <div
+      className={`min-h-screen ${isDarkMode ? "bg-slate-950 text-white dark" : "bg-slate-50 text-slate-900"} transition-colors duration-300 font-sans`}
+    >
+      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <img className="size-8" src="/Square71x71Logo.png" />
+
+          <span className="text-2xl font-bold tracking-tight">Scriblers</span>
+        </div>
+        <div className="flex items-center gap-6">
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800  transition-colors"
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <a
+            href="#download"
+            className="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-xl font-medium transition-all"
+          >
+            Download
+          </a>
+        </div>
+      </nav>
+
+      <Outlet />
+
       <footer
         className={`border-t ${isDarkMode ? "border-slate-800 text-slate-500" : "border-slate-200 text-slate-400"} py-12 text-center`}
       >
         <p>Built with ❤️ for writers and developers.</p>
-        <p className="text-xs mt-2 italic">Scriblers by x.com/shubhan3009</p>
+        <p className="text-xs mt-2 italic">
+          Scriblers by{" "}
+          <a
+            target="_blank"
+            className="hover:underline"
+            href="https://x.com/shubhan3009"
+          >
+            x.com/shubhan3009
+          </a>
+        </p>
       </footer>
     </div>
   );
 };
-
 const FeatureCard = ({
   icon,
   title,
@@ -181,4 +207,17 @@ const FeatureCard = ({
   </div>
 );
 
-export default ScriblersLanding;
+function ScriblersWebRouter() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout1 />}>
+          <Route path="/" element={<ScriblersLanding />} />
+          <Route path="/warning" element={<SmartScreenWarning />} />
+        </Route>
+        {/* Add more pages as needed */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+export default ScriblersWebRouter;

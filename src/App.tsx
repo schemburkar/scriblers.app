@@ -14,7 +14,7 @@ function App() {
         <MenuBar
           title={
             <>
-              <img className="size-6" src="src/assets/Square71x71Logo.png" />
+              <img className="size-6" src="/Square71x71Logo.png" />
               <span className="py-1 font-medium text-sm text-foreground/70">
                 Scriblers
               </span>

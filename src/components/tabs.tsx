@@ -13,7 +13,7 @@ import { Button } from "./ui/button";
 import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
-  FolderOpenIcon,
+  FileIcon,
   MoonIcon,
   PlusIcon,
   SunIcon,
@@ -83,7 +83,7 @@ export const Tabs = () => {
                 variant={"outline"}
                 size={"sm"}
               >
-                <FolderOpenIcon className="size-3 group-data-[collapsible=icon]:size-3.5 group-data-[collapsible=icon]:w-full" />
+                <FileIcon className="size-3 group-data-[collapsible=icon]:size-3.5 group-data-[collapsible=icon]:w-full" />
                 <span className="group-data-[collapsible=icon]:hidden font-normal">
                   Open File
                 </span>
