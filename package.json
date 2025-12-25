@@ -4,8 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "dev:web": "vite --mode web --port 5173",
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:web": "tsc && vite build --mode web",
     "preview": "vite preview",
     "tauri": "tauri"
   },
