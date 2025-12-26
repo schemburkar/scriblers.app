@@ -1,15 +1,12 @@
 import {
-  AlertTriangle,
   AlertTriangleIcon,
-  CheckCircle,
   CheckCircle2Icon,
   CheckCircleIcon,
   Clock4,
-  Monitor,
   MoreHorizontalIcon,
 } from "lucide-react";
 
-export default function ThankYouPage() {
+export const DownloadThanks = () => {
   return (
     <>
       {/* Main Content */}
@@ -106,4 +103,4 @@ export default function ThankYouPage() {
       {/* Footer */}
     </>
   );
-}
+};

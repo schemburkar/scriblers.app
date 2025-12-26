@@ -1,22 +1,15 @@
-import "./App.css";
-import React, { useState, ReactNode, ReactElement } from "react";
+import React, { ReactNode, ReactElement } from "react";
 import {
   Download,
   Monitor,
   Zap,
   Shield,
   Layout,
-  Moon,
-  Sun,
   ArrowRight,
   LucideProps,
 } from "lucide-react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import SmartScreenWarning from "./download-thanks";
 
-const ScriblersLanding = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
+export const Home = () => {
   // Download links - update these with your actual hosted URLs
   const DOWNLOAD_MSI = "#";
   const DOWNLOAD_EXE = "#";
@@ -37,7 +30,7 @@ const ScriblersLanding = () => {
           writing.
         </h1>
         <p
-          className={`text-xl max-w-2xl mx-auto mb-10 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}
+          className={`text-xl max-w-2xl mx-auto mb-10 dark:text-slate-400 text-slate-600`}
         >
           A lightweight, distraction-free notepad built for writers who demand
           performance. Native speed meets a modern UI.
@@ -56,7 +49,7 @@ const ScriblersLanding = () => {
           </a>
           <a
             href={DOWNLOAD_EXE}
-            className={`flex items-center gap-3 border ${isDarkMode ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-100"} px-8 py-4 rounded-xl font-bold text-lg w-full sm:w-auto transition-all`}
+            className={`flex items-center gap-3 border dark:border-slate-700 dark:hover:bg-slate-800 border-slate-300 hover:bg-slate-100 px-8 py-4 rounded-xl font-bold text-lg w-full sm:w-auto transition-all`}
           >
             Direct .exe
           </a>
@@ -67,9 +60,7 @@ const ScriblersLanding = () => {
       </header>
 
       {/* Feature Grid */}
-      <section
-        className={`py-24 ${isDarkMode ? "bg-slate-800/50" : "bg-white"}`}
-      >
+      <section className={`py-24 dark:bg-slate-800/50 bg-white`}>
         <div className="max-w-7xl mx-auto px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <FeatureCard
@@ -107,9 +98,7 @@ const ScriblersLanding = () => {
                   <div className="mt-1 bg-blue-500/20 p-1 rounded">
                     <ArrowRight size={16} className="text-sky-500" />
                   </div>
-                  <span
-                    className={isDarkMode ? "text-slate-300" : "text-slate-700"}
-                  >
+                  <span className={"dark:text-slate-300 text-slate-700"}>
                     {item}
                   </span>
                 </li>
@@ -136,59 +125,6 @@ const ScriblersLanding = () => {
   );
 };
 
-const Layout1 = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
-  // Download links - update these with your actual hosted URLs
-  const DOWNLOAD_MSI = "#";
-  const DOWNLOAD_EXE = "#";
-
-  return (
-    <div
-      className={`min-h-screen ${isDarkMode ? "bg-slate-950 text-white dark" : "bg-slate-50 text-slate-900"} transition-colors duration-300 font-sans`}
-    >
-      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <img className="size-8" src="/Square71x71Logo.png" />
-
-          <span className="text-2xl font-bold tracking-tight">Scriblers</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800  transition-colors"
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <a
-            href="#download"
-            className="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-xl font-medium transition-all"
-          >
-            Download
-          </a>
-        </div>
-      </nav>
-
-      <Outlet />
-
-      <footer
-        className={`border-t ${isDarkMode ? "border-slate-800 text-slate-500" : "border-slate-200 text-slate-400"} py-12 text-center`}
-      >
-        <p>Built with ❤️ for writers and developers.</p>
-        <p className="text-xs mt-2 italic">
-          Scriblers by{" "}
-          <a
-            target="_blank"
-            className="hover:underline"
-            href="https://x.com/shubhan3009"
-          >
-            x.com/shubhan3009
-          </a>
-        </p>
-      </footer>
-    </div>
-  );
-};
 const FeatureCard = ({
   icon,
   title,
@@ -206,18 +142,3 @@ const FeatureCard = ({
     <p className="opacity-70 leading-relaxed">{desc}</p>
   </div>
 );
-
-function ScriblersWebRouter() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout1 />}>
-          <Route path="/" element={<ScriblersLanding />} />
-          <Route path="/warning" element={<SmartScreenWarning />} />
-        </Route>
-        {/* Add more pages as needed */}
-      </Routes>
-    </BrowserRouter>
-  );
-}
-export default ScriblersWebRouter;
