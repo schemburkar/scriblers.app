@@ -1,0 +1,44 @@
+name: 'publish'
+
+on:
+  workflow_dispatch: # Allows manual trigger
+  push:
+    branches:
+      - main # Runs when you push to the 'main' branch
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm' # Changed to npm
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # THESE ARE REQUIRED FOR UPDATER TO WORK:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PASSWORD: ${{ secrets.TAURI_SIGNING_PASSWORD }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'Scriblers.app v__VERSION__'
+          releaseDraft: true # Creates a draft so you can check it before users see it
+          prerelease: false
