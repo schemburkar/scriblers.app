@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "scriblers",
+  "productName": "Scriblers",
   "version": "0.1.0",
-  "identifier": "scriblers",
+  "identifier": "app.scriblers",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "scriblers",
+        "title": "Scriblers - Distraction-free, lightweight tabbed notepad application",
         "width": 1280,
         "height": 800,
         "decorations": false
@@ -25,6 +25,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -32,5 +33,16 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM2NEMyNjcyRUJGN0YxQTMKUldTajhmZnJjaVpNeG5OWDk3ZnR0TlF6aVJubEdMalpKM0tXSnVWYWNSRmMvZUNnVXJEeTRmL2MK",
+      "endpoints": [
+        "https://github.com/schemburkar/scriblers.app/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

@@ -13,7 +13,7 @@ export const TitleBarButtons = () => {
   const appWindow = getWindow();
 
   return (
-    <div data-tauri-drag-region className="flex justify-end w-full gap-1">
+    <div data-tauri-drag-region className="flex justify-end w-auto gap-1">
       <Button
         className="bg-background/50 size-6 cursor-pointer"
         variant={"outline"}

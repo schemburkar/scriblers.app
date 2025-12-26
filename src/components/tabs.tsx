@@ -55,7 +55,7 @@ export const Tabs = () => {
             </SidebarRailToggle>
 
             <SidebarGroupContent>
-              <SidebarMenu className="max-h-[calc(100vh-7.5rem)] overflow-auto">
+              <SidebarMenu className="max-h-[calc(100vh-10.5rem)] group-data-[collapsible=icon]:max-h-[calc(100vh-12.5rem)] overflow-auto">
                 {Array.from(tabs.keys()).map((key, index) => {
                   const item = tabs.get(key);
                   if (!item) return;
@@ -63,7 +63,7 @@ export const Tabs = () => {
                 })}
               </SidebarMenu>
             </SidebarGroupContent>
-            <ButtonGroup className="w-full group-data-[collapsible=icon]:flex-col font-normal bg-accent">
+            <ButtonGroup className="w-full group-data-[collapsible=icon]:flex-col font-normal bg-accent mt-2">
               <Button
                 title="New Tab"
                 onClick={newTab}

@@ -6,6 +6,7 @@ import { MenuBar } from "./components/menu-bar";
 import { TitleBarButtons } from "./components/title-bar-buttons";
 import { Text } from "./components/text";
 import { TabHandler } from "./components/tab-dialog";
+import { Updater } from "./components/updater";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
               </span>
             </>
           }
+          header={<Updater />}
         >
           <TitleBarButtons />
         </MenuBar>

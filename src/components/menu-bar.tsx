@@ -24,9 +24,11 @@ import { onOpenFileDialog, onSaveFileDialog } from "@/lib/file-dialog-helper";
 import { useKeyboardShortcuts } from "@/lib/tab-switch";
 export const MenuBar = ({
   title,
+  header,
   children,
 }: {
   title: ReactNode;
+  header?: ReactNode;
   children: ReactNode;
 }) => {
   const {
@@ -224,6 +226,9 @@ export const MenuBar = ({
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+      <span className="w-full flex items-baseline justify-center gap-1">
+        {header}
+      </span>
       {children}
     </Menubar>
   );
