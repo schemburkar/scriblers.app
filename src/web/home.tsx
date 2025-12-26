@@ -12,10 +12,6 @@ import { DownloadButtonWrapper } from "./layout";
 import { Button } from "@/components/ui/button";
 
 export const Home = () => {
-  // Download links - update these with your actual hosted URLs
-  const DOWNLOAD_MSI = "#";
-  const DOWNLOAD_EXE = "#";
-
   return (
     <>
       <header className="max-w-7xl mx-auto px-8 pt-20 pb-32 text-center">
