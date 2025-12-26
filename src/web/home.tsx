@@ -8,6 +8,8 @@ import {
   ArrowRight,
   LucideProps,
 } from "lucide-react";
+import { DownloadButtonWrapper } from "./layout";
+import { Button } from "@/components/ui/button";
 
 export const Home = () => {
   // Download links - update these with your actual hosted URLs
@@ -37,22 +39,23 @@ export const Home = () => {
         </p>
 
         <div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-stretch justify-center gap-4"
           id="download"
         >
-          <a
-            href={DOWNLOAD_MSI}
-            className="flex items-center gap-3 bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-xl font-bold text-lg w-full sm:w-auto transition-transform active:scale-95"
-          >
-            <Download size={22} />
-            Download for Windows (.msi)
-          </a>
-          <a
-            href={DOWNLOAD_EXE}
-            className={`flex items-center gap-3 border dark:border-slate-700 dark:hover:bg-slate-800 border-slate-300 hover:bg-slate-100 px-8 py-4 rounded-xl font-bold text-lg w-full sm:w-auto transition-all`}
-          >
-            Direct .exe
-          </a>
+          <DownloadButtonWrapper type="msi">
+            <Button className="flex gap-3 gr rounded-xl font-bold text-lg w-full sm:w-auto h-full py-4">
+              <Download size={22} />
+              Download for Windows (.msi)
+            </Button>
+          </DownloadButtonWrapper>
+          <DownloadButtonWrapper type="exe">
+            <Button
+              variant={"outline"}
+              className={`flex  gap-3  px-8 py-4 rounded-xl font-bold text-lg w-full sm:w-auto h-full transition-all`}
+            >
+              Setup.exe
+            </Button>
+          </DownloadButtonWrapper>
         </div>
         <p className="mt-4 text-sm text-slate-500 flex items-center justify-center gap-2">
           <Monitor size={14} /> Coming soon to Microsoft Store

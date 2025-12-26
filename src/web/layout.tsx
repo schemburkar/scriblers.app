@@ -1,5 +1,32 @@
 import { Sun, Moon } from "lucide-react";
-import { Outlet } from "react-router-dom";
+import { ReactNode } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Installers } from "./data";
+import { Button } from "@/components/ui/button";
+
+export const DownloadButtonWrapper = ({
+  type,
+  children,
+}: {
+  type: "exe" | "msi";
+  children: ReactNode;
+}) => {
+  const navigate = useNavigate();
+
+  const handleDownload = async () => {
+    try {
+      const url = Installers[type];
+      window.open(url, "_blank");
+      navigate("/download-thanks");
+    } catch (e) {}
+  };
+
+  return (
+    <div className="contents" onClick={handleDownload}>
+      {children}
+    </div>
+  );
+};
 
 export const Layout = () => {
   return (
@@ -7,11 +34,13 @@ export const Layout = () => {
       className={`min-h-screen dark:bg-slate-950 dark:text-white bg-slate-50 text-slate-900 transition-colors duration-300 font-sans`}
     >
       <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <img className="size-8" src="/Square71x71Logo.png" />
+        <a href="/">
+          <div className="flex items-center gap-2">
+            <img className="size-8" src="/Square71x71Logo.png" />
 
-          <span className="text-2xl font-bold tracking-tight">Scriblers</span>
-        </div>
+            <span className="text-2xl font-bold tracking-tight">Scriblers</span>
+          </div>
+        </a>
         <div className="flex items-center gap-6">
           <button
             onClick={() => document.documentElement.classList.toggle("dark")}
@@ -20,12 +49,14 @@ export const Layout = () => {
             <Sun className="not-dark:hidden" size={20} />{" "}
             <Moon className="dark:hidden" size={20} />
           </button>
-          <a
-            href="#download"
-            className="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-xl font-medium transition-all"
-          >
-            Download
-          </a>
+          <DownloadButtonWrapper type="msi">
+            <Button
+              title={Installers["msi"]}
+              className="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-xl font-medium transition-all"
+            >
+              Download
+            </Button>
+          </DownloadButtonWrapper>
         </div>
       </nav>
 
