@@ -22,6 +22,7 @@ import {
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { onOpenFileDialog, onSaveFileDialog } from "@/lib/file-dialog-helper";
 import { useKeyboardShortcuts } from "@/lib/tab-switch";
+import { message } from "@tauri-apps/plugin-dialog";
 export const MenuBar = ({
   title,
   header,
@@ -141,6 +142,13 @@ export const MenuBar = ({
     setSelection(0, textarea.value.length);
   };
 
+  const about = () => {
+    message(`Scriblers app, created by x.com/shubhan3009`, {
+      title: "Scriblers v0.1.0",
+      buttons: { ok: "Ok" },
+    });
+  };
+
   return (
     <Menubar
       data-tauri-drag-region
@@ -224,6 +232,12 @@ export const MenuBar = ({
               </SidebarMenuBadge>
             )}
           </MenubarItem>
+        </MenubarContent>
+      </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger>Help</MenubarTrigger>
+        <MenubarContent>
+          <MenubarItem onClick={about}>About</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <span className="w-full flex items-baseline justify-center gap-1">
