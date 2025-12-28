@@ -7,9 +7,16 @@ import {
   Layout,
   ArrowRight,
   LucideProps,
+  MoreHorizontalIcon,
 } from "lucide-react";
 import { DownloadButtonWrapper } from "./layout";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Installers } from "./data";
 
 export const Home = () => {
   return (
@@ -39,19 +46,37 @@ export const Home = () => {
           id="download"
         >
           <DownloadButtonWrapper type="msi">
-            <Button className="flex gap-3 gr rounded-xl font-bold text-lg w-full sm:w-auto h-full py-4">
-              <Download size={22} />
-              Download for Windows (.msi)
-            </Button>
-          </DownloadButtonWrapper>
-          <DownloadButtonWrapper type="exe">
             <Button
-              variant={"outline"}
-              className={`flex  gap-3  px-8 py-4 rounded-xl font-bold text-lg w-full sm:w-auto h-full transition-all`}
+              title={Installers["msi"]}
+              className="flex items-baseline gap-2 rounded-xl font-bold w-full sm:w-auto h-full py-4"
             >
-              Setup.exe
+              <Download size={22} />
+              <span className="text-lg">Download for Windows (.msi)</span>
+              <div className="text-muted-foreground">Recomended</div>
             </Button>
           </DownloadButtonWrapper>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                title="More options"
+                variant={"outline"}
+                className={`flex gap-3 px-8 py-4 rounded-xl font-bold text-md w-full sm:w-auto h-full transition-all`}
+              >
+                <MoreHorizontalIcon className="size-"></MoreHorizontalIcon>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent asChild>
+              <DownloadButtonWrapper type="exe">
+                <Button
+                  title={Installers["exe"]}
+                  variant={"outline"}
+                  className={`flex gap-3 px-8 py-4 rounded-xl font-bold text-md w-full sm:w-auto h-full transition-all`}
+                >
+                  Windows Executable (Setup.exe)
+                </Button>
+              </DownloadButtonWrapper>
+            </PopoverContent>
+          </Popover>
         </div>
         <p className="mt-4 text-sm text-slate-500 flex items-center justify-center gap-2">
           <Monitor size={14} /> Coming soon to Microsoft Store

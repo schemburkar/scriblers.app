@@ -1,4 +1,4 @@
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, GitBranch } from "lucide-react";
 import { ReactNode } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Installers } from "./data";
@@ -42,6 +42,18 @@ export const Layout = () => {
           </div>
         </a>
         <div className="flex items-center gap-6">
+          <Button
+            variant={"ghost"}
+            onClick={() =>
+              window.open(
+                "https://github.com/schemburkar/scriblers.app",
+                "_blank",
+              )
+            }
+            className="rounded-full "
+          >
+            <GitBranch />
+          </Button>
           <button
             onClick={() => document.documentElement.classList.toggle("dark")}
             className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800  transition-colors"
