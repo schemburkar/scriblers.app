@@ -12,7 +12,29 @@ import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useActiveTab, useTabs } from "./tab-provider";
 import { useZoom } from "./zoom-provider";
 import { SidebarMenuBadge } from "./sidebar";
-import { CheckIcon } from "lucide-react";
+import {
+  ArrowUpRightFromSquareIcon,
+  CheckIcon,
+  CircleQuestionMarkIcon,
+  CopyIcon,
+  DownloadIcon,
+  FileEdit,
+  FileIcon,
+  GlobeIcon,
+  KeyboardIcon,
+  LetterTextIcon,
+  PaletteIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  SaveAll,
+  SaveIcon,
+  SpellCheckIcon,
+  SquareSquareIcon,
+  XCircleIcon,
+  XSquareIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "lucide-react";
 import { writeText, readText } from "@tauri-apps/plugin-clipboard-manager";
 import {
   TextAreaElement,
@@ -155,51 +177,62 @@ export const MenuBar = ({
   return (
     <Menubar
       data-tauri-drag-region
-      className="rounded-none z-30 w-full bg-background"
+      className="rounded-none z-30 w-full bg-background  h-7.5"
     >
-      <MenubarMenu>{title}</MenubarMenu>
+      <MenubarMenu> {title}</MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>File</MenubarTrigger>
-        <MenubarContent>
+        <MenubarTrigger className="text-xs">File</MenubarTrigger>
+        <MenubarContent className="**:text-xs">
           <MenubarItem onClick={() => newTab()}>
-            New File<MenubarShortcut>Ctrl + N</MenubarShortcut>
+            <PlusIcon /> New File<MenubarShortcut>Ctrl + N</MenubarShortcut>
             {/*⌘*/}
           </MenubarItem>
-          <MenubarItem onClick={() => onOpenFile()}>Open File</MenubarItem>
+          <MenubarItem onClick={() => onOpenFile()}>
+            <FileIcon /> Open File
+          </MenubarItem>
           <MenubarItem onClick={() => onSaveFile()}>
+            <SaveIcon />
             Save<MenubarShortcut>Ctrl + S</MenubarShortcut>
           </MenubarItem>
           <MenubarItem onClick={() => onSaveFile(true)}>
+            <SaveAll />
             Save As<MenubarShortcut>Ctrl + Shift + S</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem onClick={() => duplicate(currentId!)}>
-            Duplicate
+          <MenubarSeparator />
+          <MenubarItem disabled={!path}>
+            <FileEdit />
+            Rename
           </MenubarItem>
           <MenubarItem disabled={!path} onClick={reloadFile}>
+            <RefreshCwIcon />
             Reload File
+          </MenubarItem>
+          <MenubarItem onClick={() => duplicate(currentId!)}>
+            <SquareSquareIcon />
+            Duplicate
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem
             disabled={!path}
             onClick={async () => await writeText(path!)}
           >
-            Copy Path
+            <CopyIcon /> Copy Path
           </MenubarItem>
           <MenubarItem onClick={async () => await writeText(name)}>
-            Copy File Name
+            <CopyIcon /> Copy File Name
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={() => closeTab(currentId!)}>
-            Close tab<MenubarShortcut>Ctrl + W</MenubarShortcut>
+            <XSquareIcon /> Close tab<MenubarShortcut>Ctrl + W</MenubarShortcut>
           </MenubarItem>
           <MenubarItem onClick={() => getCurrentWindow().close()}>
-            Close window
+            <XCircleIcon /> Close window
           </MenubarItem>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>Edit</MenubarTrigger>
-        <MenubarContent>
+        <MenubarTrigger className="text-xs">Edit</MenubarTrigger>
+        <MenubarContent className="**:text-xs">
           <MenubarItem onClick={cut}>Cut</MenubarItem>
           <MenubarItem onClick={copy}>Copy</MenubarItem>
           <MenubarItem onClick={paste}>Paste</MenubarItem>
@@ -209,18 +242,25 @@ export const MenuBar = ({
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>View</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem onClick={zoomIn}>Zoom In</MenubarItem>
-          <MenubarItem onClick={zoomOut}>Zoom Out</MenubarItem>
+        <MenubarTrigger className="text-xs">View</MenubarTrigger>
+        <MenubarContent className="**:text-xs">
+          <MenubarItem onClick={zoomIn}>
+            {" "}
+            <ZoomInIcon /> Zoom In
+          </MenubarItem>
+          <MenubarItem onClick={zoomOut}>
+            {" "}
+            <ZoomOutIcon /> Zoom Out
+          </MenubarItem>
           <MenubarItem onClick={reset}>Reset Zoom</MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={toggleTheme}>
-            Toggle Theme<MenubarShortcut>Ctrl + T</MenubarShortcut>
+            <PaletteIcon /> Toggle Theme
+            <MenubarShortcut>Ctrl + T</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={toggleWordWrap}>
-            Word wrap
+            <LetterTextIcon className="stroke-muted-foreground" /> Word wrap
             {wordWrap && (
               <SidebarMenuBadge>
                 <CheckIcon />
@@ -228,7 +268,7 @@ export const MenuBar = ({
             )}
           </MenubarItem>
           <MenubarItem onClick={toggleSpellCheck}>
-            Spell Check
+            <SpellCheckIcon /> Spell Check
             {spellCheck && (
               <SidebarMenuBadge>
                 <CheckIcon />
@@ -238,19 +278,32 @@ export const MenuBar = ({
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger>Help</MenubarTrigger>
+        <MenubarTrigger className="text-xs">Help</MenubarTrigger>
 
         <Dialog>
-          <MenubarContent>
+          <MenubarContent className="**:text-xs">
+            <MenubarItem>
+              <DownloadIcon /> Check for updates
+            </MenubarItem>
             <DialogTrigger
               onClick={() => setDialogType("keyboard-shortcuts")}
               asChild
             >
-              <MenubarItem>Keyboard shortcuts</MenubarItem>
+              <MenubarItem>
+                <KeyboardIcon /> Keyboard shortcuts
+              </MenubarItem>
             </DialogTrigger>
             <DialogTrigger onClick={() => setDialogType("about")} asChild>
-              <MenubarItem>About</MenubarItem>
+              <MenubarItem>
+                <CircleQuestionMarkIcon /> About
+              </MenubarItem>
             </DialogTrigger>
+            <MenubarItem>
+              <GlobeIcon /> scriblers.app{" "}
+              <SidebarMenuBadge>
+                <ArrowUpRightFromSquareIcon className="size-3 self-baseline-last " />
+              </SidebarMenuBadge>
+            </MenubarItem>
           </MenubarContent>
 
           <DialogContent data-dialog-type={dialogType}>
@@ -269,7 +322,7 @@ export const MenuBar = ({
                   <a
                     target="_blank"
                     className="hover:underline"
-                    href="https://github.com/schemburkar/scriblers.app/LICENSE"
+                    href="https://github.com/schemburkar/scriblers.app/blob/main/LICENSE"
                   >
                     LICENSE
                   </a>{" "}
@@ -295,7 +348,7 @@ export const MenuBar = ({
                 {" "}
                 <DialogTitle>Keyboard shortcuts</DialogTitle>
               </DialogHeader>
-              <table className="table-auto border [&_td]:border [&_tr]:border **:p-2 [&_td]:first:font-mono">
+              <table className=" text-xs table-auto border [&_td]:border [&_tr]:border **:p-2 [&_td]:first:font-mono">
                 <tr>
                   <th>Shortcut</th>
                   <th>Action</th>

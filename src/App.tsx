@@ -16,7 +16,7 @@ function App() {
           title={
             <>
               <img className="size-6" src="/Square71x71Logo.png" />
-              <span className="py-1 font-medium text-sm text-foreground/70">
+              <span className="text-xs py-1 font-medium  text-foreground/70">
                 Scriblers
               </span>
             </>
@@ -27,7 +27,7 @@ function App() {
         </MenuBar>
         <main className="flex ">
           <Tabs />
-          <div className="w-full flex flex-col h-[calc(100lvh-2.25rem)] overflow-hidden">
+          <div className="w-full flex flex-col h-[calc(100lvh-1.9rem)] overflow-hidden">
             <Text />
           </div>
         </main>

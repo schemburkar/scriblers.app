@@ -15,28 +15,28 @@ export const TitleBarButtons = () => {
   return (
     <div data-tauri-drag-region className="flex justify-end w-auto gap-1">
       <Button
-        className="bg-background/50 size-6 cursor-pointer"
+        className="bg-background/50 size-5 cursor-pointer"
         variant={"outline"}
         size={"icon-sm"}
         onClick={() => appWindow?.minimize()}
       >
-        <MinusIcon />
+        <MinusIcon className="size-3.5" />
       </Button>
       <Button
-        className="bg-background/50  size-6"
+        className="bg-background/50  size-5"
         variant={"outline"}
         size={"icon-sm"}
         onClick={() => appWindow?.toggleMaximize()}
       >
-        <SquareIcon />
+        <SquareIcon className="size-3.5" />
       </Button>
       <Button
-        className="bg-background/50  size-6 hover:bg-destructive dark:hover:bg-destructive hover:text-background"
+        className="bg-background/50  size-5 hover:bg-destructive dark:hover:bg-destructive hover:text-background"
         variant={"outline"}
         size={"icon-sm"}
         onClick={() => appWindow?.close()}
       >
-        <XIcon />
+        <XIcon className="size-4" />
       </Button>
     </div>
   );
