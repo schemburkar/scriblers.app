@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { Activity, ReactNode, useState } from "react";
 import {
   Menubar,
   MenubarContent,
@@ -23,6 +23,14 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { onOpenFileDialog, onSaveFileDialog } from "@/lib/file-dialog-helper";
 import { useKeyboardShortcuts } from "@/lib/tab-switch";
 import { message } from "@tauri-apps/plugin-dialog";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "./ui/dialog";
 export const MenuBar = ({
   title,
   header,
@@ -54,7 +62,9 @@ export const MenuBar = ({
     toggleWordWrap,
   } = useZoom();
   const activeTab = useActiveTab();
-
+  const [dialogType, setDialogType] = useState<
+    "" | "about" | "keyboard-shortcuts"
+  >("");
   const onSaveFile = async (createCopy?: boolean) => {
     try {
       if (!createCopy && path) {
@@ -140,13 +150,6 @@ export const MenuBar = ({
   const selectAll = () => {
     const textarea = TextAreaElement();
     setSelection(0, textarea.value.length);
-  };
-
-  const about = () => {
-    message(`Scriblers app, created by x.com/shubhan3009`, {
-      title: "Scriblers v0.1.0",
-      buttons: { ok: "Ok" },
-    });
   };
 
   return (
@@ -236,9 +239,103 @@ export const MenuBar = ({
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>Help</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem onClick={about}>About</MenubarItem>
-        </MenubarContent>
+
+        <Dialog>
+          <MenubarContent>
+            <DialogTrigger
+              onClick={() => setDialogType("keyboard-shortcuts")}
+              asChild
+            >
+              <MenubarItem>Keyboard shortcuts</MenubarItem>
+            </DialogTrigger>
+            <DialogTrigger onClick={() => setDialogType("about")} asChild>
+              <MenubarItem>About</MenubarItem>
+            </DialogTrigger>
+          </MenubarContent>
+
+          <DialogContent data-dialog-type={dialogType}>
+            <Activity mode={dialogType == "about" ? "visible" : "hidden"}>
+              <DialogHeader>
+                {" "}
+                <DialogTitle>Scriblers v0.1.0</DialogTitle>
+                <DialogDescription>
+                  Scriblers is a blazing-fast, lightweight tabbed notepad
+                  application built with Tauri, React, and TypeScript. Designed
+                  for distraction-free writing, it combines the performance of
+                  Rust with a modern, responsive UI.
+                </DialogDescription>
+                <DialogDescription>
+                  Distributed under the GNU AGPLv3 License. See{" "}
+                  <a
+                    target="_blank"
+                    className="hover:underline"
+                    href="https://github.com/schemburkar/scriblers.app/LICENSE"
+                  >
+                    LICENSE
+                  </a>{" "}
+                  for more information.{" "}
+                </DialogDescription>
+                <DialogDescription>
+                  Created by{" "}
+                  <a
+                    target="_blank"
+                    className="hover:underline"
+                    href="https://x.com/shubhan3009"
+                  >
+                    x.com/shubhan3009
+                  </a>
+                </DialogDescription>
+                <DialogDescription>Open source credits</DialogDescription>
+              </DialogHeader>
+            </Activity>
+            <Activity
+              mode={dialogType == "keyboard-shortcuts" ? "visible" : "hidden"}
+            >
+              <DialogHeader>
+                {" "}
+                <DialogTitle>Keyboard shortcuts</DialogTitle>
+              </DialogHeader>
+              <table className="table-auto border [&_td]:border [&_tr]:border **:p-2 [&_td]:first:font-mono">
+                <tr>
+                  <th>Shortcut</th>
+                  <th>Action</th>
+                </tr>
+                <tr>
+                  <td>Ctrl + N </td>
+                  <td>New Tab </td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Tab</td>
+                  <td>Switch Tabs</td>
+                </tr>
+                <tr>
+                  <td>Ctrl + S </td>
+                  <td>Save File </td>
+                </tr>
+                <tr>
+                  <td>Ctrl + W </td>
+                  <td>Close Current Tab </td>
+                </tr>
+                <tr>
+                  <td> Ctrl + T </td>
+                  <td>Toggle Dark Mode </td>
+                </tr>
+                <tr>
+                  <td>Ctrl + Shift + S </td>
+                  <td>Save File As</td>
+                </tr>
+                <tr>
+                  <td> Ctrl + B </td>
+                  <td>Toggle Sidebar</td>
+                </tr>
+                {/*<tr>
+                      <td></td>
+                      <td></td>
+                    </tr>*/}
+              </table>
+            </Activity>
+          </DialogContent>
+        </Dialog>
       </MenubarMenu>
       <span className="w-full flex items-baseline justify-center gap-1">
         {header}
