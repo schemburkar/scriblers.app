@@ -17,10 +17,9 @@ export const Text = () => {
   // const ref = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (!currentId) return;
     const t = document.querySelector(".textarea") as HTMLTextAreaElement;
-    t.removeAttribute("selectionStart");
-    t.removeAttribute("selectionEnd");
+    t?.removeAttribute("selectionStart");
+    t?.removeAttribute("selectionEnd");
   }, [currentId]);
 
   if (!currentId) return null;

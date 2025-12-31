@@ -25,9 +25,8 @@ import { ButtonGroup } from "./ui/button-group";
 import { onOpenFileDialog } from "@/lib/file-dialog-helper";
 
 export const Tabs = () => {
-  const { tabs, currentId, toggleTheme, newTab, openFile } = useTabs();
+  const { tabs, toggleTheme, newTab, openFile } = useTabs();
 
-  if (!currentId) return null;
   const onOpenFile = async () => {
     await onOpenFileDialog((name, data, path) => openFile(name, data, path));
   };

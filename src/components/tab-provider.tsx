@@ -1,5 +1,7 @@
 import { OpenFileStore, SettingsStore } from "@/lib/store";
-import { readTextFile } from "@tauri-apps/plugin-fs";
+import { invoke } from "@tauri-apps/api/core";
+import { join, dirname } from "@tauri-apps/api/path";
+import { readTextFile, rename as renameFile } from "@tauri-apps/plugin-fs";
 import {
   createContext,
   useCallback,
@@ -12,7 +14,7 @@ import {
 type TabContextProps = {
   theme: string | undefined | "light" | "dark";
   tabs: Map<string, Tab>;
-  currentId?: string | null;
+  currentId: string;
   newTab: () => void;
   openFile: (name: string, content: string, path: string) => void;
   selectTab: (id: string) => void;
@@ -27,6 +29,8 @@ type TabContextProps = {
   closeTab: (id: string, index?: number) => void;
   toggleTheme: () => void;
   duplicate: (id: string) => void;
+  getActiveTab: () => ReturnType<typeof getActiveTab>;
+  rename: (id: string, name: string) => void;
 };
 
 const TabContext = createContext<TabContextProps | null>(null);
@@ -40,12 +44,15 @@ export const useTabs = () => {
   return context;
 };
 
-export const useActiveTab = () => {
-  const { tabs, currentId } = useTabs();
-  if (!currentId) return null;
+const getActiveTab = ({
+  tabs,
+  currentId,
+}: {
+  tabs: Map<string, Tab>;
+  currentId: string;
+}) => {
   const activeTab = tabs.get(currentId);
-  if (!activeTab) return null;
-
+  if (!activeTab) return undefined;
   const { id, name, path, content, state } = activeTab;
   return { id, name, path, content, state };
 };
@@ -54,7 +61,7 @@ export type Tab = {
   id: string;
   name: string;
   content: string;
-  state?: "modified" | "new" | "";
+  state?: "modified" | "new" | "" | "error";
   path?: string;
 };
 const getValues = async () => {
@@ -67,13 +74,20 @@ const getValues = async () => {
     if (!f) continue;
     const { name, path } = f;
     let content = f.content || "";
-    if (!content && f.path) content = await readTextFile(f.path);
+    let error = false;
+    if (!content && f.path) {
+      try {
+        content = await readTextFile(f.path);
+      } catch (err) {
+        error = true;
+      }
+    }
     tabs.set(openFiles[i], {
       id: openFiles[i],
       name,
       path,
       content,
-      state: !path ? "new" : f.content ? "modified" : "",
+      state: error ? "error" : !path ? "new" : f.content ? "modified" : "",
     });
 
     if (i == 0) {
@@ -86,14 +100,16 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   const { set, remove, get } = OpenFileStore();
   const { get: getSettings, set: setSettings } = SettingsStore();
   const [tabs, setTabs] = useState<Map<string, Tab>>(new Map<string, Tab>());
-  const [currentId, setCurrentId] = useState<string>();
+  const defaultId = crypto.randomUUID();
+
+  const [currentId, setCurrentId] = useState<string>(defaultId);
   const [theme, setTheme] = useState<string>();
 
-  const newTab = useCallback(() => {
+  const _newTab = useCallback((id: string) => {
     const tab: Tab = {
       name: "Untitled",
       content: "",
-      id: crypto.randomUUID(),
+      id,
       state: "new",
     };
     setTabs((prev) => {
@@ -109,6 +125,10 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
 
     set(tab.id, { name: tab.name });
   }, []);
+
+  const newTab = useCallback(() => {
+    _newTab(crypto.randomUUID());
+  }, [_newTab]);
 
   const openFile = useCallback(
     (name: string, content: string, path: string) => {
@@ -258,20 +278,51 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     });
   };
 
+  const rename = async (id: string, name: string) => {
+    var existingTab = tabs.get(id);
+    if (!existingTab || !existingTab.path) return;
+
+    var newPath = await join(await dirname(existingTab.path), name);
+    var tab = { ...existingTab, name: name, path: newPath };
+
+    const res = await invoke<boolean>("allow_new_path", { path: newPath });
+
+    console.log({ res });
+
+    if (!res) {
+      alert("error" + res);
+      return;
+    }
+
+    setTabs((prev) => {
+      const newTabs = new Map(prev);
+      newTabs.set(tab.id, tab);
+      return newTabs;
+    });
+
+    await renameFile(existingTab.path, newPath);
+    set(tab.id, {
+      name: tab.name,
+      path: tab.path,
+      content: tab.state == "" ? "" : tab.content,
+    });
+  };
+
+  const _getActiveTab = useCallback(() => {
+    return getActiveTab({ tabs, currentId });
+  }, [tabs, currentId]);
   useEffect(() => {
     (async () => {
-      if (currentId) return;
-      if (tabs.size == 0) {
-        const { id, tabs } = await getValues();
-        if (tabs.size != 0) {
-          setTabs(tabs);
-          id && setCurrentId(id);
-        } else {
-          newTab();
-        }
-      } else setCurrentId(Array.from(tabs.keys())[0]);
+      if (tabs.size != 0) return;
+      const { id, tabs: newTabs } = await getValues();
+      if (newTabs.size != 0) {
+        setTabs(newTabs);
+        id && setCurrentId(id);
+      } else {
+        _newTab(defaultId);
+      }
     })();
-  }, [currentId]);
+  }, [tabs, _newTab]);
 
   useEffect(() => {
     (async () => {
@@ -300,6 +351,8 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       saveAsFile,
       toggleTheme,
       duplicate,
+      getActiveTab: _getActiveTab,
+      rename,
     }),
     [
       tabs,
@@ -313,6 +366,8 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       saveAsFile,
       toggleTheme,
       duplicate,
+      _getActiveTab,
+      rename,
     ],
   );
 

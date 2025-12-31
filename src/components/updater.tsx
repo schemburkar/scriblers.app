@@ -48,7 +48,7 @@ export const Updater = () => {
       disabled={isDownloading}
       title={`New version available (v${update.version}) - Click to download and install`}
       onClick={handleUpdate}
-      className="h-full rounded-t-none bg-sky-800 text-white hover:bg-sky-900 cursor-pointer!"
+      className="h-full rounded-t-none bg-sky-800 text-white hover:bg-sky-900 cursor-pointer! animate-in fade-in slide-in-from-top-1 text-xs"
     >
       <DownloadIcon className="animate-pulse" /> Update available
     </Button>

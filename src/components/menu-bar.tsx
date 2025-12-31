@@ -8,8 +8,7 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "./ui/menubar";
-import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import { useActiveTab, useTabs } from "./tab-provider";
+import { useTabs } from "./tab-provider";
 import { useZoom } from "./zoom-provider";
 import { SidebarMenuBadge } from "./sidebar";
 import {
@@ -42,9 +41,7 @@ import {
   setSelection,
 } from "../lib/text-area-helper";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { onOpenFileDialog, onSaveFileDialog } from "@/lib/file-dialog-helper";
 import { useKeyboardShortcuts } from "@/lib/tab-switch";
-import { message } from "@tauri-apps/plugin-dialog";
 import {
   Dialog,
   DialogHeader,
@@ -53,6 +50,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "./ui/dialog";
+import { useEvents } from "@/lib/events";
+import { RenameFile } from "./rename-dialog";
 export const MenuBar = ({
   title,
   header,
@@ -63,15 +62,14 @@ export const MenuBar = ({
   children: ReactNode;
 }) => {
   const {
+    getActiveTab,
     currentId,
-    openFile,
     toggleTheme,
     newTab,
-    saveAsFile,
-    saveFile,
     text,
     closeTab,
     duplicate,
+    rename,
   } = useTabs();
 
   const {
@@ -83,51 +81,15 @@ export const MenuBar = ({
     wordWrap,
     toggleWordWrap,
   } = useZoom();
-  const activeTab = useActiveTab();
   const [dialogType, setDialogType] = useState<
     "" | "about" | "keyboard-shortcuts"
   >("");
-  const onSaveFile = async (createCopy?: boolean) => {
-    try {
-      if (!createCopy && path) {
-        await writeTextFile(path, content);
-        saveFile();
-      } else {
-        onSaveFileDialog(content, (name, path) => saveAsFile(name, path));
-      }
 
-      // You can use the file object to read its content
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const e = useEvents();
 
-  useKeyboardShortcuts({
-    newTab,
-    onSaveFile,
-    closeTab,
-    toggleTheme,
-    currentId,
-  });
+  useKeyboardShortcuts();
 
-  if (!activeTab) return null;
-
-  const { name, path, content } = activeTab;
-
-  const onOpenFile = async () => {
-    await onOpenFileDialog((name, data, path) => openFile(name, data, path));
-  };
-
-  const reloadFile = async () => {
-    try {
-      if (!path) return;
-
-      const data = await readTextFile(path);
-      text(currentId!, data, true);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const { onOpenFile, onSaveFile, reloadFile, copyPath, copyName } = e;
 
   const copy = async () => {
     const textarea = TextAreaElement();
@@ -174,6 +136,10 @@ export const MenuBar = ({
     setSelection(0, textarea.value.length);
   };
 
+  const activeTab = getActiveTab();
+  if (!activeTab) return;
+  const { name, path } = activeTab;
+
   return (
     <Menubar
       data-tauri-drag-region
@@ -182,54 +148,60 @@ export const MenuBar = ({
       <MenubarMenu> {title}</MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger className="text-xs">File</MenubarTrigger>
-        <MenubarContent className="**:text-xs">
-          <MenubarItem onClick={() => newTab()}>
-            <PlusIcon /> New File<MenubarShortcut>Ctrl + N</MenubarShortcut>
-            {/*⌘*/}
-          </MenubarItem>
-          <MenubarItem onClick={() => onOpenFile()}>
-            <FileIcon /> Open File
-          </MenubarItem>
-          <MenubarItem onClick={() => onSaveFile()}>
-            <SaveIcon />
-            Save<MenubarShortcut>Ctrl + S</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem onClick={() => onSaveFile(true)}>
-            <SaveAll />
-            Save As<MenubarShortcut>Ctrl + Shift + S</MenubarShortcut>
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem disabled={!path}>
-            <FileEdit />
-            Rename
-          </MenubarItem>
-          <MenubarItem disabled={!path} onClick={reloadFile}>
-            <RefreshCwIcon />
-            Reload File
-          </MenubarItem>
-          <MenubarItem onClick={() => duplicate(currentId!)}>
-            <SquareSquareIcon />
-            Duplicate
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem
-            disabled={!path}
-            onClick={async () => await writeText(path!)}
-          >
-            <CopyIcon /> Copy Path
-          </MenubarItem>
-          <MenubarItem onClick={async () => await writeText(name)}>
-            <CopyIcon /> Copy File Name
-          </MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem onClick={() => closeTab(currentId!)}>
-            <XSquareIcon /> Close tab<MenubarShortcut>Ctrl + W</MenubarShortcut>
-          </MenubarItem>
-          <MenubarItem onClick={() => getCurrentWindow().close()}>
-            <XCircleIcon /> Close window
-          </MenubarItem>
-        </MenubarContent>
+        <Dialog>
+          <MenubarContent className="**:text-xs">
+            <MenubarItem onClick={() => newTab()}>
+              <PlusIcon /> New File<MenubarShortcut>Ctrl + N</MenubarShortcut>
+              {/*⌘*/}
+            </MenubarItem>
+            <MenubarItem onClick={() => onOpenFile()}>
+              <FileIcon /> Open File
+            </MenubarItem>
+            <MenubarItem onClick={() => onSaveFile()}>
+              <SaveIcon />
+              Save<MenubarShortcut>Ctrl + S</MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem onClick={() => onSaveFile(true)}>
+              <SaveAll />
+              Save As<MenubarShortcut>Ctrl + Shift + S</MenubarShortcut>
+            </MenubarItem>
+            <MenubarSeparator />
+            <>
+              <DialogTrigger asChild>
+                <MenubarItem disabled={!path}>
+                  <FileEdit />
+                  Rename
+                </MenubarItem>
+              </DialogTrigger>
+            </>
+            <MenubarItem disabled={!path} onClick={reloadFile}>
+              <RefreshCwIcon />
+              Reload File
+            </MenubarItem>
+            <MenubarItem onClick={() => duplicate(currentId)}>
+              <SquareSquareIcon />
+              Duplicate
+            </MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem disabled={!path} onClick={copyPath}>
+              <CopyIcon /> Copy Path
+            </MenubarItem>
+            <MenubarItem onClick={copyName}>
+              <CopyIcon /> Copy File Name
+            </MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem onClick={() => closeTab(currentId)}>
+              <XSquareIcon /> Close tab
+              <MenubarShortcut>Ctrl + W</MenubarShortcut>
+            </MenubarItem>
+            <MenubarItem onClick={() => getCurrentWindow().close()}>
+              <XCircleIcon /> Close window
+            </MenubarItem>
+          </MenubarContent>
+          <RenameFile name={name} onSubmit={(n) => rename(currentId, n)} />
+        </Dialog>
       </MenubarMenu>
+
       <MenubarMenu>
         <MenubarTrigger className="text-xs">Edit</MenubarTrigger>
         <MenubarContent className="**:text-xs">

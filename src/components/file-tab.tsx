@@ -29,9 +29,13 @@ import {
   ContextMenuTrigger,
 } from "./ui/context-menu";
 import { MenubarShortcut } from "./ui/menubar";
+import { useEvents } from "@/lib/events";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { RenameFile } from "./rename-dialog";
 
 export const FileTab = ({ item, index }: { item: Tab; index: number }) => {
-  const { currentId, selectTab, closeTab } = useTabs();
+  const { currentId, selectTab, closeTab, duplicate, rename } = useTabs();
+  const { onSaveFile, reloadFile, copyPath, copyName } = useEvents()!;
 
   if (!currentId) return null;
 
@@ -84,43 +88,48 @@ export const FileTab = ({ item, index }: { item: Tab; index: number }) => {
           </SidebarMenuBadge>
         </SidebarMenuItem>
       </ContextMenuTrigger>
-      <ContextMenuContent className="**:text-xs">
-        <ContextMenuLabel>{item.name}</ContextMenuLabel>
-        <ContextMenuItem>
-          <SaveIcon /> Save <MenubarShortcut>Ctrl + S</MenubarShortcut>
-        </ContextMenuItem>
-        <ContextMenuItem>
-          <SaveAll /> Save As{" "}
-          <MenubarShortcut>Ctrl + Shift + S</MenubarShortcut>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem disabled={!item.path}>
-          <FileEdit /> Rename
-        </ContextMenuItem>
-        <ContextMenuItem disabled={!item.path}>
-          <RefreshCwIcon /> Reload
-        </ContextMenuItem>
-        <ContextMenuItem>
-          <SquareSquareIcon /> Duplicate
-        </ContextMenuItem>
-        <ContextMenuSeparator />
+      <Dialog>
+        <ContextMenuContent className="**:text-xs">
+          <ContextMenuLabel>{item.name}</ContextMenuLabel>
+          <ContextMenuItem onClick={() => onSaveFile()}>
+            <SaveIcon /> Save <MenubarShortcut>Ctrl + S</MenubarShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onSaveFile(true)}>
+            <SaveAll /> Save As{" "}
+            <MenubarShortcut>Ctrl + Shift + S</MenubarShortcut>
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <DialogTrigger asChild>
+            <ContextMenuItem disabled={!item.path}>
+              <FileEdit /> Rename
+            </ContextMenuItem>
+          </DialogTrigger>
+          <ContextMenuItem disabled={!item.path} onClick={reloadFile}>
+            <RefreshCwIcon /> Reload
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => duplicate(currentId!)}>
+            <SquareSquareIcon /> Duplicate
+          </ContextMenuItem>
+          <ContextMenuSeparator />
 
-        <ContextMenuItem disabled={!item.path}>
-          <CopyIcon /> Copy Path
-        </ContextMenuItem>
-        <ContextMenuItem disabled={!item.path}>
-          <CopyIcon /> Copy File Name
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem>
-          <XSquareIcon /> Close{" "}
-          {selected ? (
-            <>
-              {" this tab"} <MenubarShortcut>Ctrl + W</MenubarShortcut>
-            </>
-          ) : null}
-        </ContextMenuItem>
-      </ContextMenuContent>
+          <ContextMenuItem disabled={!item.path} onClick={copyPath}>
+            <CopyIcon /> Copy Path
+          </ContextMenuItem>
+          <ContextMenuItem disabled={!item.path} onClick={copyName}>
+            <CopyIcon /> Copy File Name
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem onClick={() => closeTab(currentId!)}>
+            <XSquareIcon /> Close{" "}
+            {selected ? (
+              <>
+                {" this tab"} <MenubarShortcut>Ctrl + W</MenubarShortcut>
+              </>
+            ) : null}
+          </ContextMenuItem>
+        </ContextMenuContent>
+        <RenameFile name={item.name} onSubmit={(n) => rename(currentId, n)} />
+      </Dialog>
     </ContextMenu>
   );
 };

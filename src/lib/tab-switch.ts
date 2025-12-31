@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Tab } from "../components/tab-provider";
+import { Tab, useTabs } from "../components/tab-provider";
+import { useEvents } from "./events";
 
 export const useTabSwitcher = (
   tabs: Map<string, Tab>,
@@ -62,13 +63,10 @@ export const useTabSwitcher = (
   return { isOpen, highlightedId };
 };
 
-export function useKeyboardShortcuts({
-  newTab,
-  onSaveFile,
-  closeTab,
-  toggleTheme,
-  currentId,
-}: any) {
+export function useKeyboardShortcuts() {
+  const { currentId, toggleTheme, newTab, closeTab } = useTabs();
+  const { onSaveFile } = useEvents();
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Use metaKey for Mac support and ctrlKey for Windows/Linux
