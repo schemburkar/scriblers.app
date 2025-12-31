@@ -52,6 +52,7 @@ import {
 } from "./ui/dialog";
 import { useEvents } from "@/lib/events";
 import { RenameFile } from "./rename-dialog";
+import { UpdaterDialog } from "./updater-dialog";
 export const MenuBar = ({
   title,
   header,
@@ -82,7 +83,7 @@ export const MenuBar = ({
     toggleWordWrap,
   } = useZoom();
   const [dialogType, setDialogType] = useState<
-    "" | "about" | "keyboard-shortcuts"
+    "" | "about" | "keyboard-shortcuts" | "update"
   >("");
 
   const e = useEvents();
@@ -254,9 +255,11 @@ export const MenuBar = ({
 
         <Dialog>
           <MenubarContent className="**:text-xs">
-            <MenubarItem>
-              <DownloadIcon /> Check for updates
-            </MenubarItem>
+            <DialogTrigger onClick={() => setDialogType("update")} asChild>
+              <MenubarItem>
+                <DownloadIcon /> Check for updates
+              </MenubarItem>
+            </DialogTrigger>
             <DialogTrigger
               onClick={() => setDialogType("keyboard-shortcuts")}
               asChild
@@ -270,12 +273,14 @@ export const MenuBar = ({
                 <CircleQuestionMarkIcon /> About
               </MenubarItem>
             </DialogTrigger>
-            <MenubarItem>
-              <GlobeIcon /> scriblers.app{" "}
-              <SidebarMenuBadge>
-                <ArrowUpRightFromSquareIcon className="size-3 self-baseline-last " />
-              </SidebarMenuBadge>
-            </MenubarItem>
+            <a href="https://scriblers.app?rel=app" target="_blank">
+              <MenubarItem>
+                <GlobeIcon /> scriblers.app{" "}
+                <SidebarMenuBadge>
+                  <ArrowUpRightFromSquareIcon className="size-3 self-baseline-last " />
+                </SidebarMenuBadge>
+              </MenubarItem>
+            </a>
           </MenubarContent>
 
           <DialogContent data-dialog-type={dialogType}>
@@ -358,6 +363,9 @@ export const MenuBar = ({
                       <td></td>
                     </tr>*/}
               </table>
+            </Activity>
+            <Activity mode={dialogType == "update" ? "visible" : "hidden"}>
+              <UpdaterDialog />
             </Activity>
           </DialogContent>
         </Dialog>
