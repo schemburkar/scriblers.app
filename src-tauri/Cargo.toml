@@ -1,7 +1,7 @@
 [package]
 name = "scriblers"
-version = "0.1.0"
-description = "A Tauri App"
+version = "0.1.1"
+description = "Scriblers"
 authors = ["you"]
 edition = "2021"
 license = "AGPL-3.0-only"
