@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Scriblers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "identifier": "app.scriblers",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -16,7 +16,8 @@
         "title": "Scriblers - Distraction-free, lightweight tabbed notepad application",
         "width": 1280,
         "height": 800,
-        "decorations": false
+        "decorations": false,
+        "dragDropEnabled": true
       }
     ],
     "security": {
@@ -26,6 +27,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "Scriblers",
     "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
@@ -33,6 +35,121 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "name": "Text Document",
+        "ext": ["txt", "rtf"],
+        "description": "Plain Text Document",
+        "role": "Editor"
+      },
+      {
+        "name": "Markdown Document",
+        "ext": ["md", "mdown", "markdown"],
+        "description": "Markdown Document",
+        "role": "Editor"
+      },
+      {
+        "name": "Data File",
+        "ext": ["json", "xml", "xaml", "csv", "tsv"],
+        "description": "Structured Data File",
+        "role": "Editor"
+      },
+      {
+        "name": "Web Document",
+        "ext": ["htm", "html", "svg"],
+        "description": "Web and Vector Document",
+        "role": "Editor"
+      },
+      {
+        "name": "JavaScript/TypeScript",
+        "ext": ["js", "mjs", "jsx", "ts", "tsx"],
+        "description": "JavaScript and TypeScript Source",
+        "role": "Editor"
+      },
+      {
+        "name": "C/C++ Source",
+        "ext": ["c", "cpp", "h", "hpp"],
+        "description": "C and C++ Source Code",
+        "role": "Editor"
+      },
+      {
+        "name": "C# Source",
+        "ext": ["cs"],
+        "description": "C# Source Code",
+        "role": "Editor"
+      },
+      {
+        "name": "Python Script",
+        "ext": ["py"],
+        "description": "Python Source Code",
+        "role": "Editor"
+      },
+      {
+        "name": "Other Languages",
+        "ext": ["java", "php", "rb", "go", "rs"],
+        "description": "Programming Language Source",
+        "role": "Editor"
+      },
+      {
+        "name": "Stylesheet",
+        "ext": ["css", "scss", "sass", "less"],
+        "description": "Cascading Style Sheet",
+        "role": "Editor"
+      },
+      {
+        "name": "SQL Script",
+        "ext": ["sql"],
+        "description": "SQL Database Script",
+        "role": "Editor"
+      },
+      {
+        "name": "Configuration File",
+        "ext": [
+          "yml",
+          "yaml",
+          "toml",
+          "ini",
+          "env",
+          "local",
+          "config",
+          "conf",
+          "cfg",
+          "properties"
+        ],
+        "description": "Configuration File",
+        "role": "Editor"
+      },
+      {
+        "name": "Shell Script",
+        "ext": ["sh", "bash", "zsh"],
+        "description": "Unix Shell Script",
+        "role": "Editor"
+      },
+      {
+        "name": "PowerShell Script",
+        "ext": ["ps1"],
+        "description": "PowerShell Script",
+        "role": "Editor"
+      },
+      {
+        "name": "Batch Script",
+        "ext": ["bat", "cmd"],
+        "description": "Windows Batch Script",
+        "role": "Editor"
+      },
+      {
+        "name": "Log File",
+        "ext": ["log"],
+        "description": "System Log File",
+        "role": "Editor"
+      },
+      {
+        "name": "Subtitle File",
+        "ext": ["srt", "vtt"],
+        "description": "Video Subtitle File",
+        "role": "Editor"
+      }
     ]
   },
   "plugins": {

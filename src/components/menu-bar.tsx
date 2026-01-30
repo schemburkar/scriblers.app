@@ -156,7 +156,7 @@ export const MenuBar = ({
               {/*⌘*/}
             </MenubarItem>
             <MenubarItem onClick={() => onOpenFile()}>
-              <FileIcon /> Open File
+              <FileIcon /> Open File<MenubarShortcut>Ctrl + O</MenubarShortcut>
             </MenubarItem>
             <MenubarItem onClick={() => onSaveFile()}>
               <SaveIcon />
@@ -287,7 +287,7 @@ export const MenuBar = ({
             <Activity mode={dialogType == "about" ? "visible" : "hidden"}>
               <DialogHeader>
                 {" "}
-                <DialogTitle>Scriblers v0.1.1</DialogTitle>
+                <DialogTitle>Scriblers v0.1.2</DialogTitle>
                 <DialogDescription>
                   Scriblers is a blazing-fast, lightweight tabbed notepad
                   application built with Tauri, React, and TypeScript. Designed

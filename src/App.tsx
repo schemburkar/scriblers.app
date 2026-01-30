@@ -7,6 +7,7 @@ import { TitleBarButtons } from "./components/title-bar-buttons";
 import { Text } from "./components/text";
 import { TabHandler } from "./components/tab-dialog";
 import { Updater } from "./components/updater";
+import { FilesIcon } from "lucide-react";
 
 function App() {
   return (
@@ -25,12 +26,17 @@ function App() {
         >
           <TitleBarButtons />
         </MenuBar>
-        <main className="flex ">
+        <main className="flex">
           <Tabs />
           <div className="w-full flex flex-col h-[calc(100lvh-1.9rem)] overflow-hidden">
             <Text />
           </div>
         </main>
+        <div className="absolute top-0 bg-accent/90 not-file-view:hidden flex h-dvh w-dvw justify-center items-center">
+          <div className="flex flex-col items-center gap-1">
+            <FilesIcon /> Drop files here to open/view
+          </div>
+        </div>
         <TabHandler />
       </ZoomProvider>
     </TabProvider>

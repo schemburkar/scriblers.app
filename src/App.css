@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant file-view (&:is(.file-view *));
 
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
@@ -128,6 +129,9 @@
     }
 }
 
+html {
+    @apply overflow-hidden;
+}
 body {
     @apply h-lvh flex m-0 flex-col
     /*backdrop-filter: var(--background);*/;

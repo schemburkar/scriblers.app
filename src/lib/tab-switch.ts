@@ -65,7 +65,7 @@ export const useTabSwitcher = (
 
 export function useKeyboardShortcuts() {
   const { currentId, toggleTheme, newTab, closeTab } = useTabs();
-  const { onSaveFile } = useEvents();
+  const { onSaveFile, onOpenFile } = useEvents();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -95,6 +95,11 @@ export function useKeyboardShortcuts() {
       if (isMod && e.shiftKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
         onSaveFile(true);
+      }
+
+      if (isMod && e.key.toLowerCase() === "o") {
+        e.preventDefault();
+        onOpenFile();
       }
 
       // Note: Ctrl+Tab logic is handled by the useTabSwitcher hook

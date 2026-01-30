@@ -54,7 +54,7 @@ export const Tabs = () => {
             </SidebarRailToggle>
 
             <SidebarGroupContent>
-              <SidebarMenu className="max-h-[calc(100vh-10.5rem)] group-data-[collapsible=icon]:max-h-[calc(100vh-12.5rem)] overflow-auto">
+              <SidebarMenu className="max-h-[calc(100vh-10.5rem)] group-data-[collapsible=icon]:max-h-[calc(100vh-12.5rem)] overflow-auto p-0.5">
                 {Array.from(tabs.keys()).map((key, index) => {
                   const item = tabs.get(key);
                   if (!item) return;

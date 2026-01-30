@@ -1,6 +1,8 @@
 import { OpenFileStore, SettingsStore } from "@/lib/store";
 import { invoke } from "@tauri-apps/api/core";
+import { listen, TauriEvent } from "@tauri-apps/api/event";
 import { join, dirname } from "@tauri-apps/api/path";
+// import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readTextFile, rename as renameFile } from "@tauri-apps/plugin-fs";
 import {
   createContext,
@@ -61,13 +63,14 @@ export type Tab = {
   id: string;
   name: string;
   content: string;
-  state?: "modified" | "new" | "" | "error";
+  state?: "modified" | "new" | "saved" | "error";
   path?: string;
 };
 const getValues = async () => {
   const { keys, get } = OpenFileStore();
   const tabs = new Map<string, Tab>();
   const openFiles = await keys();
+  console.log(openFiles);
   let id: string | null = null;
   for (let i = 0; i < openFiles.length; i++) {
     const f = await get(openFiles[i]);
@@ -87,7 +90,7 @@ const getValues = async () => {
       name,
       path,
       content,
-      state: error ? "error" : !path ? "new" : f.content ? "modified" : "",
+      state: error ? "error" : !path ? "new" : f.content ? "modified" : "saved",
     });
 
     if (i == 0) {
@@ -96,6 +99,9 @@ const getValues = async () => {
   }
   return { id, tabs };
 };
+
+
+
 export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   const { set, remove, get } = OpenFileStore();
   const { get: getSettings, set: setSettings } = SettingsStore();
@@ -137,7 +143,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
         content,
         path,
         id: crypto.randomUUID(),
-        state: "",
+        state: "saved",
       };
       setTabs((prev) => {
         const newTabs = new Map(prev);
@@ -199,7 +205,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
           ...t,
           content: txt,
           state: reset
-            ? ""
+            ? "saved"
             : edited
               ? t.state == "new"
                 ? "new"
@@ -228,7 +234,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       if (!t) return prevTabs;
 
       const newTabs = new Map(prevTabs);
-      newTabs.set(activeId, { ...t, state: "" });
+      newTabs.set(activeId, { ...t, state: "saved" });
       return newTabs;
     });
     const existing = await get(activeId);
@@ -244,7 +250,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
         if (!t) return prevTabs;
 
         const newTabs = new Map(prevTabs);
-        newTabs.set(activeId, { ...t, name, path, state: "" });
+        newTabs.set(activeId, { ...t, name, path, state: "saved" });
         return newTabs;
       });
       const existing = await get(activeId);
@@ -274,7 +280,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     set(tab.id, {
       name: tab.name,
       path: tab.path,
-      content: tab.state == "" ? "" : tab.content,
+      content: tab.state == "saved" ? "" : tab.content,
     });
   };
 
@@ -304,38 +310,161 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     set(tab.id, {
       name: tab.name,
       path: tab.path,
-      content: tab.state == "" ? "" : tab.content,
+      content: tab.state == "saved" ? "" : tab.content,
     });
   };
 
   const _getActiveTab = useCallback(() => {
     return getActiveTab({ tabs, currentId });
   }, [tabs, currentId]);
+
+  // 1. Initialize tabs - remove 'tabs' from dependencies to prevent loop
   useEffect(() => {
-    (async () => {
-      if (tabs.size != 0) return;
+    const initTabs = async () => {
+      if (tabs.size !== 0) return;
       const { id, tabs: newTabs } = await getValues();
-      if (newTabs.size != 0) {
+      if (newTabs.size !== 0) {
         setTabs(newTabs);
         id && setCurrentId(id);
       } else {
         _newTab(defaultId);
       }
-    })();
+    };
+
+    initTabs();
+  }, [tabs.size, _newTab]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     if (tabs.size != 0) return;
+  //     const { id, tabs: newTabs } = await getValues();
+  //     if (newTabs.size != 0) {
+  //       setTabs(newTabs);
+  //       id && setCurrentId(id);
+  //     } else {
+  //       _newTab(defaultId);
+  //     }
+  //   })();
+  // }, [tabs, _newTab]);
+
+  // 1. Initialize tabs - remove 'tabs' from dependencies to prevent loop
+  useEffect(() => {
+    const initTabs = async () => {
+      if (tabs.size !== 0) return; // Early return prevents re-initialization
+
+      const { id, tabs: newTabs } = await getValues();
+      if (newTabs.size !== 0) {
+        setTabs(newTabs);
+        id && setCurrentId(id);
+      } else {
+        _newTab(defaultId);
+      }
+    };
+
+    initTabs();
   }, [tabs, _newTab]);
 
+  // 2. Initialize theme
   useEffect(() => {
-    (async () => {
+    const initTheme = async () => {
       const theme = await getSettings("theme");
       setTheme(theme || "");
-    })();
+    };
+
+    initTheme();
   }, []);
 
+  // 3. Apply theme to DOM
   useEffect(() => {
     if (theme) {
       document.documentElement.classList.toggle("dark", theme === "dark");
     }
   }, [theme]);
+
+  // 4. Handle CLI file argument on mount
+  useEffect(() => {
+    const handleCliFile = async () => {
+      try {
+        const file = await invoke<string>("get_cli_arg");
+        if (file) {
+          const content = await readTextFile(file);
+          const name = file.split(/[\\/]/).pop()!;
+          openFile(name, content, file);
+        }
+      } catch (e) {
+        console.error('Failed to open CLI file:', e);
+        alert(JSON.stringify(e));
+      }
+    };
+
+    handleCliFile();
+  }, [openFile]);
+
+
+  // 5. Listen for new file open events
+  useEffect(() => {
+    let unlistenFn: (() => void) | null = null;
+
+    const setupListener = async () => {
+      unlistenFn = await listen<string>('new-file-open', async (event) => {
+        try {
+          const content = await readTextFile(event.payload);
+          const name = event.payload.split(/[\\/]/).pop()!;
+          console.log('Opening new file in existing instance:', event.payload);
+          openFile(name, content, event.payload);
+        } catch (e) {
+          console.error('Failed to open file:', e);
+        }
+      });
+    };
+
+    setupListener();
+
+    return () => {
+      unlistenFn?.();
+    };
+  }, [openFile]);
+
+
+  // 6. Listen for drag-drop events
+  useEffect(() => {
+    const unlistenFn = listen<{ paths: string[] }>(TauriEvent.DRAG_DROP, async (event) => {
+      const files = event.payload.paths;
+      console.log("Dropped files:", files);
+      document.documentElement.classList.toggle("file-view", false);
+
+      if (files?.length > 0) {
+        for (const file of files) {
+          try {
+            const content = await readTextFile(file);
+            const name = file.split(/[\\/]/).pop()!;
+            openFile(name, content, file);
+          } catch (e) {
+            console.error(`Failed to open file ${file}:`, e);
+          }
+        }
+      }
+    });
+
+    const unlistenFnStart = listen<{ paths: string[] }>(TauriEvent.DRAG_OVER, async () => {
+      document.documentElement.classList.toggle("file-view", true);
+    });
+    const unlistenFnEnd = listen<{ paths: string[] }>(TauriEvent.DRAG_LEAVE, async () => {
+      document.documentElement.classList.toggle("file-view", false);
+    });
+
+    const pr = Promise.all([unlistenFn, unlistenFnStart, unlistenFnEnd]);
+
+    return () => {
+      pr.then(([fn1, fn2, fn3]) => {
+        fn1();
+        fn2();
+        fn3();
+      })
+
+    };
+  }, [openFile]);
+
 
   const contextValue = useMemo<TabContextProps>(
     () => ({

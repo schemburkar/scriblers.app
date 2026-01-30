@@ -6,9 +6,6 @@ Scriblers is a blazing-fast, lightweight tabbed notepad application built with *
 ![License](https://img.shields.io/github/license/schemburkar/scriblers.app)
 [![Builds](https://github.com/schemburkar/scriblers.app/actions/workflows/publish.yml/badge.svg)](https://github.com/schemburkar/scriblers.app/actions/workflows/publish.yml)
 
-<!--![GitHub tag status](https://img.shields.io/github/checks-status/schemburkar/scriblers.app/v0.1.1)
-[All releases & changelog](https://github.com/schemburkar/scriblers.app/releases)
-![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/schemburkar/scriblers.app/Scriblers_0.1.1_x64_en-US)-->
 
 ## Features
 - **Tabbed Interface**: Seamlessly manage multiple documents with open, close, and duplicate tabs.
