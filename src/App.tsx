@@ -26,7 +26,7 @@ function App() {
         >
           <TitleBarButtons />
         </MenuBar>
-        <main className="flex">
+        <main className="flex app">
           <Tabs />
           <div className="w-full flex flex-col h-[calc(100lvh-1.9rem)] overflow-hidden">
             <Text />

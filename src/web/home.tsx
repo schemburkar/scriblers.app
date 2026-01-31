@@ -42,16 +42,16 @@ export const Home = () => {
         </p>
 
         <div
-          className="flex flex-col sm:flex-row items-stretch justify-center gap-4"
+          className="flex flex-row items-center justify-center gap-4"
           id="download"
         >
           <DownloadButtonWrapper type="msi">
             <Button
               title={Installers["msi"]}
-              className="flex items-baseline gap-2 rounded-xl font-bold w-full sm:w-auto h-full py-4"
+              className="flex items-baseline gap-2 rounded-xl font-bold w-auto h-full py-4"
             >
               <Download size={22} />
-              <span className="text-lg">Download for Windows (.msi)</span>
+              <span className="text-xs sm:text-lg">Download for Windows (.msi)</span>
               <div className="text-muted-foreground">Recomended</div>
             </Button>
           </DownloadButtonWrapper>
@@ -60,7 +60,7 @@ export const Home = () => {
               <Button
                 title="More options"
                 variant={"outline"}
-                className={`flex gap-3 px-8 py-4 rounded-xl font-bold text-md w-full sm:w-auto h-full transition-all`}
+                className={`flex gap-3 px-8 py-3 rounded-xl font-bold text-md  sm:w-auto h-full transition-all`}
               >
                 <MoreHorizontalIcon className="size-"></MoreHorizontalIcon>
               </Button>
