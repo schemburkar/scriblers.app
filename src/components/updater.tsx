@@ -25,7 +25,7 @@ export const Updater = () => {
         } else {
           setUpdate({ status: false, version: "", info: undefined });
         }
-      } catch (e) {}
+      } catch (e) { }
     };
     setTimeout(doUpdate, 5000);
   }, []);

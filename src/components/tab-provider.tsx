@@ -1,4 +1,4 @@
-import { OpenFileStore, SettingsStore } from "@/lib/store";
+import { OpenFileStore, SettingsStore, FileOrderStore } from "@/lib/store";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, TauriEvent } from "@tauri-apps/api/event";
 import { join, dirname } from "@tauri-apps/api/path";
@@ -68,12 +68,26 @@ export type Tab = {
 };
 const getValues = async () => {
   const { keys, get } = OpenFileStore();
+  const { get: getFileOrder, set: setFileOrder } = FileOrderStore();
+  let tabOrder = await getFileOrder('order');
+
+
   const tabs = new Map<string, Tab>();
   const openFiles = await keys();
   console.log(openFiles);
-  let id: string | null = null;
-  for (let i = 0; i < openFiles.length; i++) {
-    const f = await get(openFiles[i]);
+  let id: string | null = await getFileOrder('selected');
+
+  if (!tabOrder || tabOrder.length === 0) {
+    tabOrder = openFiles;
+    await setFileOrder("order", tabOrder);
+  }
+
+
+  for (let i = 0; i < tabOrder.length; i++) {
+    const tabId = tabOrder[i];
+    if (!openFiles.includes(tabId)) continue;
+
+    const f = await get(tabId);
     if (!f) continue;
     const { name, path } = f;
     let content = f.content || "";
@@ -85,16 +99,16 @@ const getValues = async () => {
         error = true;
       }
     }
-    tabs.set(openFiles[i], {
-      id: openFiles[i],
+    tabs.set(tabId, {
+      id: tabId,
       name,
       path,
       content,
       state: error ? "error" : !path ? "new" : f.content ? "modified" : "saved",
     });
 
-    if (i == 0) {
-      id = openFiles[0];
+    if (id == null && i == 0) {
+      id = tabId;
     }
   }
   return { id, tabs };
@@ -105,13 +119,15 @@ const getValues = async () => {
 export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   const { set, remove, get } = OpenFileStore();
   const { get: getSettings, set: setSettings } = SettingsStore();
+  const { get: getFileOrder, set: setFileOrder } = FileOrderStore();
+
   const [tabs, setTabs] = useState<Map<string, Tab>>(new Map<string, Tab>());
   const defaultId = crypto.randomUUID();
 
   const [currentId, setCurrentId] = useState<string>(defaultId);
   const [theme, setTheme] = useState<string>();
 
-  const _newTab = useCallback((id: string) => {
+  const _newTab = useCallback(async (id: string) => {
     const tab: Tab = {
       name: "Untitled",
       content: "",
@@ -126,10 +142,13 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
 
     setTabs((prev) => {
       setCurrentId(tab.id);
+      setFileOrder('selected', tab.id);
       return prev;
     });
 
     set(tab.id, { name: tab.name });
+
+    setFileOrder('order', [...(await getFileOrder('order') || []), tab.id]);
   }, []);
 
   const newTab = useCallback(() => {
@@ -137,7 +156,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
   }, [_newTab]);
 
   const openFile = useCallback(
-    (name: string, content: string, path: string) => {
+    async (name: string, content: string, path: string) => {
       const tab: Tab = {
         name,
         content,
@@ -153,18 +172,24 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
 
       setTabs((prev) => {
         setCurrentId(tab.id);
+        setFileOrder('selected', tab.id);
+
         return prev;
       });
       set(tab.id, { name, path });
+      setFileOrder('order', [...(await getFileOrder('order') || []), tab.id]);
+
     },
     [],
   );
 
   const selectTab = useCallback((id: string) => {
     setCurrentId(id);
+    setFileOrder('selected', id);
+
   }, []);
 
-  const closeTab = useCallback((id: string, index?: number) => {
+  const closeTab = useCallback(async (id: string, index?: number) => {
     setTabs((prevTabs) => {
       const newTabs = new Map(prevTabs);
       newTabs.delete(id);
@@ -173,6 +198,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
         if (prevCurrent !== id) return prevCurrent;
         const keys = Array.from(newTabs.keys());
         if (newTabs.size == 0) {
+          setFileOrder('selected', '');
           return ""; // effect should handle current change
         } else {
           if (!index) {
@@ -180,13 +206,20 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
             if (index === -1)
               throw new Error("Ivalid opeation: Index out of bounds");
           }
-          return keys[index] || keys[index - 1];
+          const val = keys[index] || keys[index - 1];
+          setFileOrder('selected', val);
+          return val;
+
         }
+
       });
 
       return newTabs;
     });
     remove(id);
+
+    setFileOrder('order', [...(await getFileOrder('order') || []).filter(a => a !== id)]);
+
   }, []);
 
   const text = useCallback(
@@ -267,7 +300,7 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
     await setSettings("theme", nextTheme);
   }, [theme]);
 
-  const duplicate = (id: string) => {
+  const duplicate = async (id: string) => {
     var tab = { ...tabs.get(id)!, id: crypto.randomUUID() };
 
     setTabs((prev) => {
@@ -282,6 +315,10 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       path: tab.path,
       content: tab.state == "saved" ? "" : tab.content,
     });
+
+    setFileOrder('order', [...(await getFileOrder('order') || []), tab.id]);
+    setFileOrder('selected', tab.id);
+
   };
 
   const rename = async (id: string, name: string) => {
@@ -326,6 +363,8 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       if (newTabs.size !== 0) {
         setTabs(newTabs);
         id && setCurrentId(id);
+        id && setFileOrder('selected', id);
+
       } else {
         _newTab(defaultId);
       }
@@ -356,6 +395,8 @@ export const TabProvider = ({ children }: React.ComponentProps<"div">) => {
       if (newTabs.size !== 0) {
         setTabs(newTabs);
         id && setCurrentId(id);
+        id && setFileOrder('selected', id);
+
       } else {
         _newTab(defaultId);
       }

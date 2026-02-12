@@ -33,6 +33,11 @@ type Settings = {
   startup_tabs: "new-tab" | "re-open";
 };
 
+type FileOrder = {
+  order: string[]
+  selected: string
+};
+
 export const OpenFileStore = () => loadStore<OpenFile>("openFiles.json");
 
 export const SettingsStore = () => {
@@ -43,6 +48,19 @@ export const SettingsStore = () => {
     return val as Settings[K] | null;
   };
   const set = async <K extends keyof Settings>(key: K, val: Settings[K]) => {
+    await store.set(key, val);
+  };
+  return { get, set };
+};
+
+export const FileOrderStore = () => {
+  const store = loadStore<any>("fileorder.json");
+
+  const get = async <K extends keyof FileOrder>(key: K) => {
+    const val = await store.get(key);
+    return val as FileOrder[K] | null;
+  };
+  const set = async <K extends keyof FileOrder>(key: K, val: FileOrder[K]) => {
     await store.set(key, val);
   };
   return { get, set };
