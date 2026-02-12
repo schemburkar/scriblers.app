@@ -62,7 +62,7 @@ export const Tabs = () => {
                 })}
               </SidebarMenu>
             </SidebarGroupContent>
-            <ButtonGroup className="w-full group-data-[collapsible=icon]:flex-col font-normal bg-accent mt-2">
+            <ButtonGroup className="  rounded-md w-full group-data-[collapsible=icon]:flex-col font-normal bg-accent mt-2">
               <Button
                 title="New Tab"
                 onClick={newTab}

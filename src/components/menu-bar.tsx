@@ -335,6 +335,10 @@ export const MenuBar = ({
                   <td>New Tab </td>
                 </tr>
                 <tr>
+                  <td>Ctrl + O </td>
+                  <td>Open File </td>
+                </tr>
+                <tr>
                   <td>Ctrl + Tab</td>
                   <td>Switch Tabs</td>
                 </tr>
