@@ -1,6 +1,6 @@
 [package]
 name = "scriblers"
-version = "0.1.2"
+version = "0.1.3"
 description = "Scriblers"
 authors = ["Shubhan Chemburkar"]
 edition = "2021"

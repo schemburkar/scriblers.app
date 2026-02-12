@@ -287,7 +287,7 @@ export const MenuBar = ({
             <Activity mode={dialogType == "about" ? "visible" : "hidden"}>
               <DialogHeader>
                 {" "}
-                <DialogTitle>Scriblers v0.1.2</DialogTitle>
+                <DialogTitle>Scriblers v0.1.3</DialogTitle>
                 <DialogDescription>
                   Scriblers is a blazing-fast, lightweight tabbed notepad
                   application built with Tauri, React, and TypeScript. Designed
