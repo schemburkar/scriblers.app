@@ -1,6 +1,6 @@
 export const TextAreaClassName = "textarea";
 export const TextAreaElement = (): HTMLTextAreaElement =>
-  document.querySelector(`.${TextAreaClassName}`)!;
+  document.querySelector(`[data-active].${TextAreaClassName}`)!;
 
 export const getSelection = () => {
   const textarea = TextAreaElement();
